@@ -1,0 +1,19 @@
+# This is an example for mapping own identifiers to the AWS instance types.
+# To get the list of all instance types, aws ec2 describe-instance-types [--region=<region>] 
+# (Not sure if the region matters!) 
+#
+# <label>: <instance type>
+t2.nano:    t2.nano  # xen
+t2.micro:   t2.micro  # xen
+t2.small:   t2.small  # xen
+t2.medium:  t2.medium  # xen
+t2.large:   t2.large  # xen
+t2.xlarge:  t2.xlarge  # xen
+t2.2xlarge: t2.2xlarge  # xen
+t3.nano:    t3.nano  # nitro
+t3.micro:   t3.micro  # nitro
+t3.small:   t3.small  # nitro
+t3.medium:  t3.medium  # nitro
+t3.large:   t3.large  # nitro
+t3.xlarge:  t3.xlarge  # nitro
+t3.2xlarge: t3.2xlarge  # nitro

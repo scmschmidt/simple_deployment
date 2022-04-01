@@ -1,0 +1,10 @@
+# This is an example for mapping own identifiers to the size identifiers used by Azure.
+# To get the list of all sizes for a location(!) run: az vm list-sizes --location <location>
+#
+# <label>: <azure_size>
+standard_b1:    Standard_B1ls
+standard_b1ms:  Standard_B1ms
+standard_b1s:   Standard_B1s
+standard_b2ms:  Standard_B2ms
+standard_b2s:   Standard_B2s
+standard_b4ms:  Standard_B4ms

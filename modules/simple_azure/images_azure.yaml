@@ -1,0 +1,30 @@
+# This is an example for "images_azure.yaml", which need to be created in your
+# project root for the simple_azure module to find it.
+#
+# The labels can be chosen freely and should reference the Azure image in
+# the format <publisher>:<offer>:<sku>  (Example: SUSE:sles-15-sp3-byos:gen2)
+# A list of all images can be retrieved with:
+# 'az vm image list --output table --all [--publisher PUBLISHER] [--offer OFFER] , [--sku SKU]'
+#
+# <label>: <publisher>:<offer>:<sku>
+
+sles_12.3:      SUSE:SLES-BYOS:12-SP3
+sles_12.4:      SUSE:SLES-BYOS:12-sp4-gen2
+sles_12.5:      SUSE:sles-12-sp5-byos:gen2
+sles_15:        SUSE:SLES-BYOS:15-gen2
+sles_15.1:      SUSE:sles-15-sp1-byos:gen2
+sles_15.2:      SUSE:sles-15-sp2-byos:gen2
+sles_15.3:      SUSE:sles-15-sp3-byos:gen2
+sles4sap_12.3:  SUSE:SLES-SAP-BYOS:12-SP3
+sles4sap_12.4:  SUSE:SLES-SAP-BYOS:12-sp4-gen2
+sles4sap_12.5:  SUSE:sles-sap-12-sp5-byos:gen2
+sles4sap_15:    SUSE:SLES-SAP-BYOS:15-gen2
+sles4sap_15.1:  SUSE:sles-sap-15-sp1-byos:gen2
+sles4sap_15.2:  SUSE:sles-sap-15-sp2-byos:gen2
+sles4sap_15.3:  SUSE:sles-sap-15-sp3-byos:gen2
+
+
+
+
+
+

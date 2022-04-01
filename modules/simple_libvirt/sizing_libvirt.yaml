@@ -1,0 +1,28 @@
+# This is an example for a simple sizing definition. The idea is to introduce a similar concept 
+# like AWS or Azure use it to simplify the usage or to use the same identifiers for similar 
+# virtual machines across the providers.
+#
+# Each block has an arbitrary label and must contain definitions for the fixed(!) parameters
+# 'vcpu', 'memory' and 'disksize'.
+#
+# <label>:
+#  vcpu:     <amount of vcpus>
+#  memory:   <memory in MiB>       
+#  disksize: <size for OS disk in MiB>  (0 == size of qcow2 image)
+
+nano:
+  vcpu:     1
+  memory:   512
+  disksize: 0
+micro:
+  vcpu:     1
+  memory:   512
+  disksize: 1500
+tiny:
+  vcpu:     2
+  memory:   2048
+  disksize: 1500
+large:
+  vcpu:     4
+  memory:   4096
+  disksize: 2000

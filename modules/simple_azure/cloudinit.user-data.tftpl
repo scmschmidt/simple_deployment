@@ -1,0 +1,77 @@
+
+#cloud-config
+# vim: syntax=yaml
+#
+# This is a cloudinit configuration to setup certain things on deployment.
+# See https://cloudinit.readthedocs.io/en/latest/topics/modules.html for all
+# the possibilities and https://cloudinit.readthedocs.io/en/latest/topics/examples.html for some examples.
+#
+# This example is written to support SLE OpenStack cloud images (used for libvirt) as well as the images on
+# AWS and Azure. Therefore you can use this for all three modules 'simple_libvirt', 'simple_aws' and 'simple_azure'.
+
+# Step 1 - Creating logon user and allow root logons (all key-based)
+#
+# We create an unprivileged user 'enter' who can authenticates with an RSA key. As member of the wheel
+# group he can do a password-less sudo (requires sudoers drop-in made by the provisioning script).
+# Also we provide a SSH key for the root login. If you don't need that, you can leave root alone.
+# (On AWS a blocker needs to be removed! See below at step 2).
+
+users:
+  - name: ${admin_username}
+    groups: wheel
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${admin_user_key}
+  - name: root
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${admin_user_key}
+
+
+# Step 2 - Preparation of sudoers and registration on SCC 
+#
+# If you want to to an update or install software, do it after the registration here 
+# in this script. The cloud-init package module will not work, if the deployed image 
+# has no repositories defined (BYOS!)
+
+write_files:
+  - path: /run/provision.sh
+    permissions: 0500
+    owner: root
+    content: |
+      #!/bin/bash
+
+      # Disable root SSH login if wanted (in a cheap way).
+      [ "${enable_root_login}" -eq 0 ] && ( echo 'PermitRootLogin no' >> /etc/ssh/sshd_config ; systemctl restart sshd.service )
+
+      # Delete dummyadmin we had to define for Azure (even it got not provisioned).
+      # You never know. Better try to remove it anyways.
+      userdel -r dummyadmin
+
+      # Remove cloud-regionsrv-client-addon-azure.
+      # The timer removes the registration done by SUSEConnect on Azure instances.
+      rpm -e cloud-regionsrv-client-addon-azure
+
+      # Allowing users of the wheel group to do a passwordless sudo.
+      # ('sudo: yes' in the user section did not work)
+      echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/00_wheel_nopasswd
+
+      # Remove login blocker in authorized_keys for root on AWS.
+      # AWS puts a root blocker into /root/.ssh/authorized_keys, which we remove.
+      # This entry has no line feed and gets mixed up with the appended root key. 
+      # Therefore this "strange" sed replace.
+      # If you don't want/need direct root login, you can remove the command.
+      sed -i 's/^no-port-forwarding,.*sleep 10" ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
+
+      # Load German keymap if necessary.
+      # (This is only necessary for logins in the OpenStack SLES cloud images.
+      # Also, for unknown reasons, the cloud-init keyboard module didn't work.)
+      [[ $(localectl --no-pager status | grep Keymap) =~ ${keymap} ]] || /usr/bin/localectl set-keymap "${keymap}"
+
+      # Register the SLES.
+      # (On Azure the cleaning was necessary)
+      SUSEConnect --clean
+      SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
+
+runcmd:
+  - /run/provision.sh
