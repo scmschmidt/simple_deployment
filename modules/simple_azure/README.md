@@ -10,7 +10,8 @@ It makes use of https://registry.terraform.io/providers/hashicorp/azurerm/latest
 module "simple_azure" {
 
   # Path to the module.
-  source = ""github.com/hashicorp/example"./modules/simple_azure" CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+  #source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_azure" # Does not work currently. :-/
+  source = "./modules/simple_azure"
   
   # Region and used subnet.
   location = "westeurope"

@@ -26,6 +26,9 @@ I'll do bug fixing of cause and also maybe enhance it a bit, but only to the ext
 
 You don't need to clone this repository. It would be enough to reference the git repo in your terraform plan like shown in the examples. Terraform will download and install the modules on initialization.
 
+> :exclamation: Sadly this does not work currently!
+> For now clone the repo and use the local path to the module directory you want to use.
+
 If you don't need a provider (meaning, libvirt, Azure or AWS), you can skip the installation part for it. Of cause you can't use the module later on.
 
 ###  Install `terraform`
