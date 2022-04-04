@@ -1,7 +1,7 @@
 # simple_azure
 
 Creates a bunch of virtual machines on Azure.
-It makes use of https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs.
+It makes use of https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs and https://registry.terraform.io/providers/skeggse/metadata/latest/docs.
 
 
 ## Example Usage
@@ -11,7 +11,7 @@ module "simple_azure" {
 
   # Path to the module.
   #source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_azure" # Does not work currently. :-/
-  source = "./modules/simple_azure"
+  source = "./modules/simple_azure"   # Point to the module directory after you have cloned/downloaded the repo.
   
   # Region and used subnet.
   location = "westeurope"
@@ -20,9 +20,17 @@ module "simple_azure" {
   # The name prefix for our resources.
   name = "sschmidt-spielwiese"
 
-  # Operating system and instance type.
-  image = "sles4sap_12.5"
-  size  = "standard_b1"
+  # List of the machines to create. Each machine is a tuple of 'size' and 'image'.
+  machines = [
+    ["standard_b1", "sles4sap_15"],
+    ["standard_b1", "sles4sap_15"],
+    ["standard_b1", "sles4sap_15.1"],
+    ["standard_b1", "sles4sap_15.1"],
+    ["standard_b1", "sles4sap_15.2"],
+    ["standard_b1", "sles4sap_15.2"],
+    ["standard_b1", "sles4sap_15.3"],
+    ["standard_b1", "sles4sap_15.3"]
+  ]
 
   # We need a German keyboard.
   keymap = "de-latin1-nodeadkeys"
@@ -37,9 +45,20 @@ module "simple_azure" {
 
   # We also want to logon as root.
   enable_root_login = true
+}
 
-  # We need only one instance for now.
-  amount = 1
+# Return the Name, size/image and IP address of each instance, eg.:
+#   test_machines_B = [
+#     "sschmidt-testlandscape-B-0 : standard_b1/sles4sap_15 -> 137.116.221.168",
+#     "sschmidt-testlandscape-B-1 : standard_b1/sles4sap_15 -> 20.224.248.88",
+#     ...
+output "test_machines" {
+  value = [
+    for name, info in module.test_landscape_B.machine_info :
+    "${name} : ${info.size}/${info.image} -> ${info.ip_address}"
+  ]
+  description = "Information about the instances."
+  sensitive   = false
 }
 ```
 
@@ -66,21 +85,25 @@ The following arguments are supported:
 
   Name of the environment. It is used throughout the installation as prefix for the resources.
 
-* `image` (mandatory)
+* `machines` (mandatory)
 
-  Identifier to select the correct AMI for the virtual machine.
-  The identifiers and the images must be provided by the file `images_azure.yaml`in the project root directory! 
-  This file must contain the identifiers you want to use, which point to the AMI. The available images may depend on the location.
+  List of tuples with the size and image data for the instance: `[size, image]`
+
+  Size is an identifier to select the sizing for the virtual machine. 
+  The identifiers must be provided by the file `sizing_azure.yaml` in the project root directory, which 
+  must contain the identifiers you want to use, which point to the identifiers used by Azure.. 
+  
+  An example can be found in the modules directory.
+  
+  Image is an identifier to select the correct source image for the virtual machine.
+  The identifiers and the images must be provided by the file `images_azure.yaml` in the project root directory, which
+  must contain the identifiers you want to use, which point to the image description used by Azure.
 
   An example can be found in the modules directory.
 
-* `size` (mandatory)
-
-  Identifier to select the sizing for the virtual machine. 
-  The identifiers must be provided by the file `sizing_azure.yaml` in the project root directory! 
-  The file must contain the identifiers you want to use, which point to the identifiers used by Azure.. 
-
-  An example can be found in the modules directory.
+  The idea to use a mapping instead of the provider identifiers is to provide a way to have common identifiers for all providers. 
+  For example It would be possible to use always a size of 'medium' or an image  of 'sles12_sp1' which get translated
+  to the correct identifiers for AWS, Azure and libvirt.  
 
 * `keymap` (optional)
 
@@ -125,12 +148,18 @@ The following arguments are supported:
 
 ## Output
 
-The module ootputs the following variables:
+The module outputs the following variables:
 
-* `machine_address` (list)
+* `machines` (list)
 
-   The public IP address of all instance.
+  The azurerm_linux_virtual_machine data for each instance.
 
-* `machine_name` (list)
+* `machine_info` (object)
 
-   The names of all instances.
+  Aggregated information for each instance.
+  The instance names get used as keys and the value is an object with:
+   
+  * `id` - The instance id.
+  * `size` - The sizing identifier used in the plan.
+  * `image` - The image identifier used in the plan.
+  * `ip_address` - The public IP for the instance.

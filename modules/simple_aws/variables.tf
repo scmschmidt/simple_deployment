@@ -14,14 +14,9 @@ variable "name" {
   type        = string
 }
 
-variable "image" {
-  description = "Identifier to select the correct AMI for the virtual machine."
-  type        = string
-}
-
-variable "size" {
-  description = "Identifier to chose the instance type for the virtual machine."
-  type        = string
+variable "machines" {
+  description = "List of machine definitions to deploy. Each element is a tupel of size identifier and image identifier."
+  type        = list(list(string))
 }
 
 variable "keymap" {
@@ -57,10 +52,4 @@ variable "enable_root_login" {
   description = "Enable or disable the SSH root login (via admin user key)."
   type        = bool
   default     = false
-}
-
-variable "amount" {
-  description = "Amount of virtual machines which should be created."
-  type        = number
-  default     = 1
 }

@@ -1,6 +1,7 @@
 # Here some important locals to make it easier to change certain things.
 locals {
-  image_map  = yamldecode(file("${path.root}/images_aws.yaml"))
+  number_of_instances = length(var.machines)
+  image_map  = yamldecode(file("${path.root}/images_aws.yaml"))[var.location]
   sizing_map = yamldecode(file("${path.root}/sizing_aws.yaml"))
   cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
   cloudinit_userdata = templatefile(local.cloudinit_template, { keymap = var.keymap,
@@ -17,6 +18,10 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 3.75"
+    }
+    metadata = {
+      source  = "skeggse/metadata"
+      version = "~> 0.2.0"
     }
   }
   required_version = ">= 1.1.0"
@@ -82,16 +87,29 @@ resource "aws_key_pair" "admin-ssh" {
 
 # Create the instance.
 resource "aws_instance" "instance" {
-  count         = var.amount
-  ami           = local.image_map[var.image]
-  instance_type = local.sizing_map[var.size]
+  count         = local.number_of_instances
+  ami           = local.image_map[var.machines[count.index][1]]
+  instance_type = local.sizing_map[var.machines[count.index][0]]
   #key_name                    = "admin-key"  # not needed, since we usee cloud-init to deploy the user
   vpc_security_group_ids      = [aws_security_group.security_group.id]
   associate_public_ip_address = true
   subnet_id                   = module.vpc.public_subnets[0]
   user_data                   = local.cloudinit_userdata
+  
   tags = {
     Name = "${var.name}-${count.index}"
   }
 }
 
+# Meta data to store some information of each instance for output.
+resource "metadata_value" "machine_info" {
+  count  = local.number_of_instances
+  update = true
+  inputs = {
+    id         = aws_instance.instance[count.index].id
+    name       = aws_instance.instance[count.index].tags["Name"]
+    size       = var.machines[count.index][0]
+    image      = var.machines[count.index][1]
+    ip_address = aws_instance.instance[count.index].public_ip
+  }
+}

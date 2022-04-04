@@ -1,11 +1,19 @@
-output "machine_address" {
-  value       = libvirt_domain.domain[*].network_interface[0].addresses[0]
-  description = "The primary IP address of the first interface of all virtual machines."
+output "machines" {
+  value       = libvirt_domain.domain[*]
+  description = "The data of the deployed machines."
   sensitive   = false
 }
 
-output "machine_name" {
-  value       = libvirt_domain.domain[*].name
-  description = "The names of the created virtual machines."
+output "machine_info" {
+  value       = {
+    for machine in metadata_value.machine_info[*]:
+      "${machine.outputs.name}" => {
+        "id"         = machine.outputs.id,
+        "size"       = machine.outputs.size,
+        "image"      = machine.outputs.image
+        "ip_address" = machine.outputs.ip_address
+      }
+    }
+  description = "Some aggregated data about deployed machines."
   sensitive   = false
 }

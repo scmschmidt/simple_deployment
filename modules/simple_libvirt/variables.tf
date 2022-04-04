@@ -15,15 +15,11 @@ variable "name" {
   type        = string
 }
 
-variable "image" {
-  description = "Identifier for the operating system which points to the actual image."
-  type        = string
+variable "machines" {
+  description = "List of machine definitions to deploy. Each element is a tupel of size identifier and image identifier."
+  type        = list(list(string))
 }
 
-variable "size" {
-  description = "Identifier to describe vCPU, memory and disk size requirements for the virtual machine."
-  type        = string
-}
 variable "keymap" {
   description = "The keymap used on the machine."
   type        = string
@@ -57,10 +53,4 @@ variable "enable_root_login" {
   description = "Enable or disable the SSH root login (via admin user key)."
   type        = bool
   default     = false
-}
-
-variable "amount" {
-  description = "Amount of virtual machines which should be created."
-  type        = number
-  default     = 1
 }

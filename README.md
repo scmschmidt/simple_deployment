@@ -15,10 +15,10 @@ In short, my requirements are:
   * defining the (SLE) operating system,
   * **minimal** influence on machine sizing (memory, CPUs, disk size, etc.),
   * amount of machines.
-* root access to the machine by given ssh key or password  CHECKOUT
-* logon user ...
-* registration on the SCC with given key
-* (a bit more, but this was not doable on libvirt, AWS and Azure all together, so I used Ansible later on)
+* root access to the machine by ssh key
+* logon user with ssh key
+* registration on the SCC (or other registration server)
+* (a bit more, but this was not doable on libvirt, AWS and Azure all together, so I plan to use Ansible later on)
 
 I'll do bug fixing of cause and also maybe enhance it a bit, but only to the extend of my needs. There are no plans to add stuff for more complex deployments. Feel free to fork and work on your own!  
 
@@ -26,7 +26,7 @@ I'll do bug fixing of cause and also maybe enhance it a bit, but only to the ext
 
 You don't need to clone this repository. It would be enough to reference the git repo in your terraform plan like shown in the examples. Terraform will download and install the modules on initialization.
 
-> :exclamation: Sadly this does not work currently!
+> :exclamation: Sadly this does not work currently and I still have to figure out why!
 > For now clone the repo and use the local path to the module directory you want to use.
 
 If you don't need a provider (meaning, libvirt, Azure or AWS), you can skip the installation part for it. Of cause you can't use the module later on.
@@ -140,7 +140,7 @@ How to set this up, is beyond this guide.
 
 ## Usage
 
-Here a brief example how to setup three small machines with SLES 15 SP3 each on libvirt, AWS and Azure.
+Here a brief example how to setup some test machines on libvirt, AWS and Azure.
 You can find detailed descriptions about how to use the modules here:
 
 * [simple_libvirt](modules/simple_libvirt/README.md)
@@ -150,34 +150,129 @@ You can find detailed descriptions about how to use the modules here:
 Anyways, you need at least a minor understanding of terraform.
 
 ```
-module "simple_aws" {
-  source         = "./modules/simple_aws"
-  location       = "eu-central-1"
-  name           = "sschmidt-spielwiese"
-  image          = "sles_15.3"
-  size           = "small"
-  admin_user_key = "ssh-rsa youdidnotexpectmyrealkeyhere,didyou sschmidt-key" 
-  amount         = 3
+# Our test landscapes with two machines per SLES for SAP 15 release on AWS (A), Azure (B) and libvirt (C).
+
+module "test_landscape_A" {
+  source   = "../../modules/simple_aws"
+  location = "eu-west-1"
+  name     = "sschmidt-testlandscape-A"
+  machines = [
+    ["t3.nano", "sles4sap_15"],
+    ["t3.nano", "sles4sap_15"],
+    ["t3.nano", "sles4sap_15.1"],
+    ["t3.nano", "sles4sap_15.1"],
+    ["t3.nano", "sles4sap_15.2"],
+    ["t3.nano", "sles4sap_15.2"],
+    ["t3.nano", "sles4sap_15.3"],
+    ["t3.nano", "sles4sap_15.3"]
+  ]
+  admin_user_key                = "ssh-rsa ..."
+  subscription_registration_key = "INTERNAL-USE-ONLY-f1..."
+  enable_root_login             = true
 }
 
-module "simple_azure" {
-  source         = "./modules/simple_azure"
-  location       = "westeurope"
-  name           = "sschmidt-spielwiese"
-  image          = "sles_15.3"
-  size           = "small"
-  admin_user_key = "ssh-rsa youdidnotexpectmyrealkeyhere,didyou sschmidt-key" 
-  amount         = 3
+module "test_landscape_B" {
+  source   = "../../modules/simple_azure"
+  location = "westeurope"
+  name     = "sschmidt-testlandscape-B"
+  machines = [
+    ["standard_b1", "sles4sap_15"],
+    ["standard_b1", "sles4sap_15"],
+    ["standard_b1", "sles4sap_15.1"],
+    ["standard_b1", "sles4sap_15.1"],
+    ["standard_b1", "sles4sap_15.2"],
+    ["standard_b1", "sles4sap_15.2"],
+    ["standard_b1", "sles4sap_15.3"],
+    ["standard_b1", "sles4sap_15.3"]
+  ]
+  admin_user_key                = "ssh-rsa ..."
+  subscription_registration_key = "INTERNAL-USE-ONLY-f1..."
+  enable_root_login             = true
 }
 
-module "simple_libvirt" {
-  source         = "./modules/simple_libvirt"
-  name           = "sschmidt-spielwiese"
-  image          = "sles_15.3"
-  size           = "small"
-  admin_user_key = "ssh-rsa youdidnotexpectmyrealkeyhere,didyou sschmidt-key" 
-  amount         = 3
+module "test_landscape_C" {
+  source   = "../../modules/simple_libvirt"
+  name     = "sschmidt-testlandscape-C"
+  machines = [
+    ["micro", "sles_15"],
+    ["micro", "sles_15"],
+    ["micro", "sles_15.1"],
+    ["micro", "sles_15.1"],
+    ["micro", "sles_15.2"],
+    ["micro", "sles_15.2"],
+    ["micro", "sles_15.3"],
+    ["micro", "sles_15.3"]
+  ]
+  admin_user_key                = "ssh-rsa ..."
+  subscription_registration_key = "INTERNAL-USE-ONLY-f1..."
+  enable_root_login             = true
 }
+
+
+# Name, size, image and IP address of the deployed machines.
+
+output "test_machines_A" {
+  value = [
+    for name, info in module.test_landscape_A.machine_info :
+    "${name} : ${info.size}/${info.image} -> ${info.ip_address}"
+  ]
+}
+
+output "test_machines_B" {
+  value = [
+    for name, info in module.test_landscape_B.machine_info :
+    "${name} : ${info.size}/${info.image} -> ${info.ip_address}"
+  ]
+}
+
+output "test_machines_C" {
+  value = [
+    for name, info in module.test_landscape_C.machine_info :
+    "${name} : ${info.size}/${info.image} -> ${info.ip_address}"
+  ]
+}
+
+```
+After `terraform init` and `terraform apply` we get at the end the output:
+
+```
+...
+Apply complete! Resources: 23 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+test_machines_A = [
+  "sschmidt-testlandscape-A-0 : t3.nano/sles4sap_15 -> 34.245.45.135",
+  "sschmidt-testlandscape-A-1 : t3.nano/sles4sap_15 -> 54.154.207.236",
+  "sschmidt-testlandscape-A-2 : t3.nano/sles4sap_15.1 -> 34.245.168.131",
+  "sschmidt-testlandscape-A-3 : t3.nano/sles4sap_15.1 -> 54.155.156.5",
+  "sschmidt-testlandscape-A-4 : t3.nano/sles4sap_15.2 -> 52.211.229.92",
+  "sschmidt-testlandscape-A-5 : t3.nano/sles4sap_15.2 -> 54.154.136.163",
+  "sschmidt-testlandscape-A-6 : t3.nano/sles4sap_15.3 -> 34.240.45.133",
+  "sschmidt-testlandscape-A-7 : t3.nano/sles4sap_15.3 -> 34.244.251.98",
+]
+
+test_machines_B = [
+  "sschmidt-testlandscape-B-0 : standard_b1/sles4sap_15 -> 137.116.221.168",
+  "sschmidt-testlandscape-B-1 : standard_b1/sles4sap_15 -> 20.224.248.88",
+  "sschmidt-testlandscape-B-2 : standard_b1/sles4sap_15.1 -> 20.224.255.211",
+  "sschmidt-testlandscape-B-3 : standard_b1/sles4sap_15.1 -> 20.224.254.154",
+  "sschmidt-testlandscape-B-4 : standard_b1/sles4sap_15.2 -> 20.224.252.93",
+  "sschmidt-testlandscape-B-5 : standard_b1/sles4sap_15.2 -> 20.224.249.16",
+  "sschmidt-testlandscape-B-6 : standard_b1/sles4sap_15.3 -> 13.81.68.71",
+  "sschmidt-testlandscape-B-7 : standard_b1/sles4sap_15.3 -> 20.224.255.224",
+]
+
+test_machines_C = [
+  "sschmidt-testlandscape-C-0 : micro/sles_15 -> 172.31.191.116",
+  "sschmidt-testlandscape-C-1 : micro/sles_15 -> 172.31.83.231",
+  "sschmidt-testlandscape-C-2 : micro/sles_15.1 -> 172.31.30.92",
+  "sschmidt-testlandscape-C-3 : micro/sles_15.1 -> 172.31.0.52",
+  "sschmidt-testlandscape-C-4 : micro/sles_15.2 -> 172.31.185.59",
+  "sschmidt-testlandscape-C-5 : micro/sles_15.2 -> 172.31.63.76",
+  "sschmidt-testlandscape-C-6 : micro/sles_15.3 -> 172.31.205.179",
+  "sschmidt-testlandscape-C-7 : micro/sles_15.3 -> 172.31.253.48",
+]
 ```
 
 ## Changelog

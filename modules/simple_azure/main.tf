@@ -1,8 +1,8 @@
 # Here some important locals to make it easier to change certain things.
 locals {
+  number_of_instances = length(var.machines)
   image_map  = yamldecode(file("${path.root}/images_azure.yaml"))
   sizing_map = yamldecode(file("${path.root}/sizing_azure.yaml"))
-  image_urn  = local.image_map[var.image]
   cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
   cloudinit_userdata = templatefile(local.cloudinit_template, { keymap = var.keymap,
                                                                 admin_username = var.admin_user, 
@@ -18,6 +18,10 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 2.65"
+    }
+    metadata = {
+      source = "skeggse/metadata"
+      version = "~> 0.2.0"
     }
   }
   required_version = ">= 1.1.0"
@@ -51,7 +55,7 @@ resource "azurerm_subnet" "subnet" {
 
 # Create public IPs
 resource "azurerm_public_ip" "public_ip" {
-  count               = var.amount
+  count               = local.number_of_instances
   name                = "${var.name}-public_ip-${count.index}"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
@@ -79,7 +83,7 @@ resource "azurerm_network_security_group" "security_group" {
 
 # Create network interfaces.
 resource "azurerm_network_interface" "network_interface" {
-  count               = var.amount
+  count               = local.number_of_instances
   name                = "${var.name}-network_interface-${count.index}"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
@@ -94,18 +98,18 @@ resource "azurerm_network_interface" "network_interface" {
 
 # Connect the security group to the network interfaces.
 resource "azurerm_network_interface_security_group_association" "network_interface_security_group_association" {
-  count                     = var.amount
+  count                     = local.number_of_instances
   network_interface_id      = element(azurerm_network_interface.network_interface.*.id, count.index)
   network_security_group_id = azurerm_network_security_group.security_group.id
 }
 
 # And finally create the virtual machines.
 resource "azurerm_linux_virtual_machine" "virtual_machine" {
-  count               = var.amount
+  count               = local.number_of_instances
   name                = "${var.name}-${count.index}"
   resource_group_name = azurerm_resource_group.resource_group.name
   location            = azurerm_resource_group.resource_group.location
-  size                = local.sizing_map[var.size]
+  size                = local.sizing_map[var.machines[count.index][0]]
 
   custom_data = base64encode(local.cloudinit_userdata)
 
@@ -128,9 +132,22 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
 
   # The source image to use.additional_capabilities {
   source_image_reference {
-    publisher = split(":", local.image_urn)[0]
-    offer     = split(":", local.image_urn)[1]
-    sku       = split(":", local.image_urn)[2]
+    publisher = split(":", local.image_map[var.machines[count.index][1]])[0]
+    offer     = split(":", local.image_map[var.machines[count.index][1]])[1]
+    sku       = split(":", local.image_map[var.machines[count.index][1]])[2]
     version   = "latest"
+  }
+}
+
+# Meta data to store some information of each instance for output.
+resource "metadata_value" "machine_info" {
+  count  = local.number_of_instances
+  update = false
+  inputs = {
+    id         = azurerm_linux_virtual_machine.virtual_machine[count.index].id
+    name       = azurerm_linux_virtual_machine.virtual_machine[count.index].name
+    size       = var.machines[count.index][0]
+    image      = var.machines[count.index][1]
+    ip_address = azurerm_linux_virtual_machine.virtual_machine[count.index].public_ip_address
   }
 }

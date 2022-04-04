@@ -3,6 +3,7 @@
 locals {
   # URI to libvirt.
   libvirt_uri = var.location
+  number_of_instances = length(var.machines)
   image_map   = yamldecode(file("${path.root}/images_libvirt.yaml"))
   sizing_map  = yamldecode(file("${path.root}/sizing_libvirt.yaml"))
   cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
@@ -20,6 +21,10 @@ terraform {
     libvirt = {
       source  = "dmacvicar/libvirt"
       version = "~> 0.6.14"
+    }
+    metadata = {
+      source = "skeggse/metadata"
+      version = "~> 0.2.0"
     }
   }
   required_version = ">= 1.1.0"
@@ -49,37 +54,33 @@ resource "libvirt_network" "network" {
 
 # The master image for all virtual machines.
 resource "libvirt_volume" "master" {
-  name   = "${var.name}-${var.image}.qcow2"
-  source = local.image_map[var.image]
+  count  = local.number_of_instances
+  name   = "${var.name}-${var.machines[count.index][1]}.qcow2"
+  source = local.image_map[var.machines[count.index][1]]
   format = "qcow2"
 }
 
 # Each virtual machine needs its own disk.
 resource "libvirt_volume" "volume" {
-  name           = "${var.name}-${var.image}-${count.index}.qcow2"
-  base_volume_id = libvirt_volume.master.id
-  count          = var.amount
-  #size           = var.disk_size != 0 ? var.disk_size * 1024 * 1024 : null
-  size = lookup(local.sizing_map[var.size], "disksize") != 0 ? lookup(local.sizing_map[var.size], "disksize") * 1024 * 1024 : null
+  count          = local.number_of_instances
+  name           = "${var.name}-${var.machines[count.index][1]}-${count.index}.qcow2"
+  base_volume_id = libvirt_volume.master[count.index].id
+  size           = lookup(local.sizing_map[var.machines[count.index][0]], "disksize") != 0 ? lookup(local.sizing_map[var.machines[count.index][0]], "disksize") * 1024 * 1024 : null
 }
 
 # Use cloudinit to do some preparation.
 resource "libvirt_cloudinit_disk" "cloudinit_disk" {
   name = "${var.name}_cloudinit.iso"
-  #user_data      = data.template_file.user_data.rendered
-  #network_config = data.template_file.network_config.rendered
   user_data      = local.cloudinit_userdata
   network_config = templatefile("${path.module}/cloudinit.network.tftpl", {})
 }
 
 # Create the machine.
 resource "libvirt_domain" "domain" {
-  count = var.amount
-  name  = "${var.name}-${var.image}-${count.index}"
-  #memory    = var.memory
-  #vcpu      = var.vcpu
-  memory    = lookup(local.sizing_map[var.size], "memory")
-  vcpu      = lookup(local.sizing_map[var.size], "vcpu")
+  count = local.number_of_instances
+  name  = "${var.name}-${count.index}"
+  memory    = lookup(local.sizing_map[var.machines[count.index][0]], "memory")
+  vcpu      = lookup(local.sizing_map[var.machines[count.index][0]], "vcpu")
   cloudinit = libvirt_cloudinit_disk.cloudinit_disk.id
   network_interface {
     network_name   = var.name
@@ -87,5 +88,18 @@ resource "libvirt_domain" "domain" {
   }
   disk {
     volume_id = element(libvirt_volume.volume.*.id, count.index)
+  }
+}
+
+# Meta data to store some information of each vm for output.
+resource "metadata_value" "machine_info" {
+  count  = local.number_of_instances
+  update = true
+  inputs = {
+    id         = libvirt_domain.domain[count.index].id
+    name       = libvirt_domain.domain[count.index].name
+    size       = var.machines[count.index][0]
+    image      = var.machines[count.index][1]
+    ip_address = libvirt_domain.domain[count.index].network_interface[0].addresses[0]
   }
 }

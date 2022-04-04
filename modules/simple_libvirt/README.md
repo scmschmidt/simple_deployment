@@ -1,7 +1,7 @@
 # simple_azure
 
 Creates a bunch of virtual machines via libvirt.
-It makes use of https://registry.terraform.io/providers/dmacvicar/libvirt/latest/docs.
+It makes use of https://registry.terraform.io/providers/dmacvicar/libvirt/latest/docs and https://registry.terraform.io/providers/skeggse/metadata/latest/docs.
 
 
 ## Example Usage
@@ -11,7 +11,7 @@ module "simple_libvirt" {
 
   # Path to the module.
   #source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_libvirt" # Does not work currently. :-/
-  source = "./modules/simple_libvirt"
+  source = "./modules/simple_libvirt"   # Point to the module directory after you have cloned/downloaded the repo.
   
   # URI to libvirtd and used subnet.
   location = qemu:///system"
@@ -20,9 +20,17 @@ module "simple_libvirt" {
   # The name prefix for our resources.
   name = "sschmidt-spielwiese"
 
-  # Operating system and instance type.
-  image = "sles4sap_12.5"
-  size = "micro"
+  # List of the machines to create. Each machine is a tuple of 'size' and 'image'.
+  machines = [
+    ["micro", "sles_15"],
+    ["micro", "sles_15"],
+    ["micro", "sles_15.1"],
+    ["micro", "sles_15.1"],
+    ["micro", "sles_15.2"],
+    ["micro", "sles_15.2"],
+    ["micro", "sles_15.3"],
+    ["micro", "sles_15.3"]
+  ]
 
   # We need a German keyboard.
   keymap = "de-latin1-nodeadkeys"
@@ -37,9 +45,6 @@ module "simple_libvirt" {
 
   # We also want to logon as root.
   enable_root_login = true
-
-  # We need only one instance for now.
-  amount = 1
 }
 ```
 
@@ -67,21 +72,25 @@ The following arguments are supported:
 
   Name of the environment. It is used throughout the installation as prefix for the resources.
 
-* `image` (mandatory)
+* `machines` (mandatory)
 
-  Identifier to select the correct AMI for the virtual machine.
-  The identifiers and the images must be provided by the file `images_libvirt.yaml`in the project root directory! 
-  This file must contain the identifiers you want to use, which point to the the local path or URI for the image.
+  List of tuples with the size and image data for the instance: `[size, image]`
+
+  Size is an identifier to select the sizing for the virtual machine. 
+  The identifiers must be provided by the file `sizing_libvirt.yaml` in the project root directory, which 
+  must contain the identifiers you want to use, which contains sizing for vcpu, memory and disk.
+  
+  An example can be found in the modules directory.
+  
+  Image is an identifier to select the correct qcow image for the virtual machine.
+  The identifiers and the images must be provided by the file `images_libvirt.yaml`, which 
+  must contain the identifiers you want to use, which point to the qcow image.
 
   An example can be found in the modules directory.
 
-* `size` (mandatory)
-
-  Identifier to select the sizing for the virtual machine. 
-  The identifiers must be provided by the file `sizing_libvirt.yaml` in the project root directory! 
-  The file must contain the identifiers you want to use, which store the sizing definitions. 
-
-  An example can be found in the modules directory.
+  The idea to use a mapping instead of the provider identifiers is to provide a way to have common identifiers for all providers. 
+  For example It would be possible to use always a size of 'medium' or an image  of 'sles12_sp1' which get translated
+  to the correct identifiers for AWS, Azure and libvirt.  
 
 * `keymap` (optional)
 
@@ -114,24 +123,22 @@ The following arguments are supported:
 * `enable_root_login` (optional)
 
   Enable or disable the SSH root login (with `admin user key`).
-  
-  Default:      false 
-  
-* `amount` (optional)
-
-  So many instances of this machine description get created.
-   
-  Default:      1 
 
 
 ## Output
 
-The module ootputs the following variables:
+The module outputs the following variables:
 
-* `machine_address` (list)
+* `machines` (list)
 
-   The public IP address of all instance.
+  The libvirt_domain data for each domain.
 
-* `machine_name` (list)
+* `machine_info` (object)
 
-   The names of all instances.
+  Aggregated information for each virtual machine.
+  The machine names get used as keys and the value is an object with:
+   
+  * `id` - The instance id.
+  * `size` - The sizing identifier used in the plan.
+  * `image` - The image identifier used in the plan.
+  * `ip_address` - The (first) IP (of the first interface) for the machine.

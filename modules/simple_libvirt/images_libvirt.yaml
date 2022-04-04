@@ -11,7 +11,7 @@ sles_12.1:  /isos/SLES12-SP1-JeOS-SE-for-OpenStack-Cloud.x86_64-GM.qcow2
 sles_12.3:  /isos/SLES12-SP3-JeOS-for-OpenStack-Cloud.x86_64-GM.qcow2
 sles_12.4:  /isos/SLES12-SP4-JeOS.x86_64-12.4-OpenStack-Cloud-GM.qcow2
 sles_12.5:  /isos/SLES12-SP5-JeOS.x86_64-12.5-OpenStack-Cloud-GM.qcow2
-sles15:     /isos/SLES15-JeOS.x86_64-15.0-OpenStack-Cloud-GM.qcow2
+sles_15:    /isos/SLES15-JeOS.x86_64-15.0-OpenStack-Cloud-GM.qcow2
 sles_15.1:  /isos/SLES15-SP1-JeOS.x86_64-15.1-OpenStack-Cloud-QU5.qcow2
 sles_15.2:  /isos/SLES15-SP2-JeOS.x86_64-15.2-OpenStack-Cloud-QU2.qcow2
 sles_15.3:  /isos/SLES15-SP3-JeOS.x86_64-15.3-OpenStack-Cloud-QU2.qcow2
