@@ -53,7 +53,7 @@ resource "libvirt_network" "network" {
   }
 }
 
-# The master images for all used operationg systems.
+# The master images for all used operating systems.
 resource "libvirt_volume" "master" {
   for_each = local.used_os
   name   = "${var.name}-master-${each.key}.qcow2"
