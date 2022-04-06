@@ -4,6 +4,7 @@ locals {
   # URI to libvirt.
   libvirt_uri = var.location
   number_of_instances = length(var.machines)
+  used_os = toset([for maschine in var.machines: maschine[1]])
   image_map   = yamldecode(file("${path.root}/images_libvirt.yaml"))
   sizing_map  = yamldecode(file("${path.root}/sizing_libvirt.yaml"))
   cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
@@ -52,19 +53,19 @@ resource "libvirt_network" "network" {
   }
 }
 
-# The master image for all virtual machines.
+# The master images for all used operationg systems.
 resource "libvirt_volume" "master" {
-  count  = local.number_of_instances
-  name   = "${var.name}-${var.machines[count.index][1]}.qcow2"
-  source = local.image_map[var.machines[count.index][1]]
+  for_each = local.used_os
+  name   = "${var.name}-master-${each.key}.qcow2"
+  source = local.image_map[each.key]
   format = "qcow2"
 }
 
-# Each virtual machine needs its own disk.
+# Each virtual machine needs its own disk pointing to a master.
 resource "libvirt_volume" "volume" {
   count          = local.number_of_instances
   name           = "${var.name}-${var.machines[count.index][1]}-${count.index}.qcow2"
-  base_volume_id = libvirt_volume.master[count.index].id
+  base_volume_id = libvirt_volume.master[var.machines[count.index][1]].id
   size           = lookup(local.sizing_map[var.machines[count.index][0]], "disksize") != 0 ? lookup(local.sizing_map[var.machines[count.index][0]], "disksize") * 1024 * 1024 : null
 }
 
