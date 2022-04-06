@@ -172,16 +172,13 @@ module "test_landscape_B" {
   source   = "../../modules/simple_azure"
   location = "westeurope"
   name     = "sschmidt-testlandscape-B"
-  machines = [
-    ["standard_b1", "sles4sap_15"],
-    ["standard_b1", "sles4sap_15"],
-    ["standard_b1", "sles4sap_15.1"],
-    ["standard_b1", "sles4sap_15.1"],
-    ["standard_b1", "sles4sap_15.2"],
-    ["standard_b1", "sles4sap_15.2"],
-    ["standard_b1", "sles4sap_15.3"],
-    ["standard_b1", "sles4sap_15.3"]
-  ]
+  machines = {
+    1    = ["standard_b1", "sles4sap_15"],
+    2    = ["standard_b1", "sles4sap_15.1"],
+    "3a" = ["standard_b1", "sles4sap_15.1"],
+    "3b" = ["standard_b1", "sles4sap_15.2"],
+    4    = ["standard_b1", "sles4sap_15.3"]
+  }
   admin_user_key                = "ssh-rsa ..."
   subscription_registration_key = "INTERNAL-USE-ONLY-f1..."
   enable_root_login             = true
@@ -246,15 +243,12 @@ test_machines_A = [
 
 
 ----
-test_machines_A = [
-  "sschmidt-testlandscape-A-0 : t3.nano/sles4sap_15 -> 34.245.45.135",
-  "sschmidt-testlandscape-A-1 : t3.nano/sles4sap_15 -> 54.154.207.236",
-  "sschmidt-testlandscape-A-2 : t3.nano/sles4sap_15.1 -> 34.245.168.131",
-  "sschmidt-testlandscape-A-3 : t3.nano/sles4sap_15.1 -> 54.155.156.5",
-  "sschmidt-testlandscape-A-4 : t3.nano/sles4sap_15.2 -> 52.211.229.92",
-  "sschmidt-testlandscape-A-5 : t3.nano/sles4sap_15.2 -> 54.154.136.163",
-  "sschmidt-testlandscape-A-6 : t3.nano/sles4sap_15.3 -> 34.240.45.133",
-  "sschmidt-testlandscape-A-7 : t3.nano/sles4sap_15.3 -> 34.244.251.98",
+test_machines_B = [
+  "sschmidt-testlandscape-B-1 : standard_b1/sles4sap_15 -> 40.113.123.170",
+  "sschmidt-testlandscape-B-2 : standard_b1/sles4sap_15.1 -> 40.113.123.58",
+  "sschmidt-testlandscape-B-3a : standard_b1/sles4sap_15.1 -> 40.113.126.132",
+  "sschmidt-testlandscape-B-3b : standard_b1/sles4sap_15.2 -> 40.113.123.133",
+  "sschmidt-testlandscape-B-4 : standard_b1/sles4sap_15.3 -> 40.113.123.40",
 ]
 ----
 

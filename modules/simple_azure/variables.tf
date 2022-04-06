@@ -15,8 +15,8 @@ variable "name" {
 }
 
 variable "machines" {
-  description = "List of machine definitions to deploy. Each element is a tupel of size identifier and image identifier."
-  type        = list(list(string))
+  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tupel of size identifier and image identifier as value."
+  type        = map(list(string))
 }
 
 variable "keymap" {

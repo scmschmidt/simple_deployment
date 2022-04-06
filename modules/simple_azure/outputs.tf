@@ -1,18 +1,17 @@
-
 output "machines" {
-  value       = azurerm_linux_virtual_machine.virtual_machine[*]
+  value       = azurerm_linux_virtual_machine.virtual_machine
   description = "The data of the deployed machines."
   sensitive   = false
 }
 
 output "machine_info" {
   value       = {
-    for machine in metadata_value.machine_info[*]:
-      "${machine.outputs.name}" => {
-        "id"         = machine.outputs.id,
-        "size"       = machine.outputs.size,
-        "image"      = machine.outputs.image
-        "ip_address" = machine.outputs.ip_address
+    for id, data in azurerm_linux_virtual_machine.virtual_machine:
+      "${data.name}" => {
+        "id"         = data.id,
+        "size"       = var.machines[id][0],
+        "image"      = var.machines[id][1]
+        "ip_address" = data.public_ip_address
       }
     }
   description = "Some aggregated data about deployed machines."
