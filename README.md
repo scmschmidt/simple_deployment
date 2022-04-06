@@ -156,16 +156,13 @@ module "test_landscape_A" {
   source   = "../../modules/simple_aws"
   location = "eu-west-1"
   name     = "sschmidt-testlandscape-A"
-  machines = [
-    ["t3.nano", "sles4sap_15"],
-    ["t3.nano", "sles4sap_15"],
-    ["t3.nano", "sles4sap_15.1"],
-    ["t3.nano", "sles4sap_15.1"],
-    ["t3.nano", "sles4sap_15.2"],
-    ["t3.nano", "sles4sap_15.2"],
-    ["t3.nano", "sles4sap_15.3"],
-    ["t3.nano", "sles4sap_15.3"]
-  ]
+  machines = {
+    1    = ["t3.nano", "sles4sap_15"],
+    2    = ["t3.nano", "sles4sap_15.1"],
+    "3a" = ["t3.nano", "sles4sap_15.1"],
+    "3b" = ["t3.nano", "sles4sap_15.2"],
+    4    = ["t3.nano", "sles4sap_15.3"]
+  }
   admin_user_key                = "ssh-rsa ..."
   subscription_registration_key = "INTERNAL-USE-ONLY-f1..."
   enable_root_login             = true
@@ -238,6 +235,17 @@ Apply complete! Resources: 23 added, 0 changed, 0 destroyed.
 
 Outputs:
 
+
+test_machines_A = [
+  "sschmidt-testlandscape-A-1 : t3.nano/sles4sap_15 -> 54.246.144.93",
+  "sschmidt-testlandscape-A-2 : t3.nano/sles4sap_15.1 -> 34.245.42.110",
+  "sschmidt-testlandscape-A-3a : t3.nano/sles4sap_15.1 -> 63.35.169.23",
+  "sschmidt-testlandscape-A-3b : t3.nano/sles4sap_15.2 -> 54.195.64.139",
+  "sschmidt-testlandscape-A-4 : t3.nano/sles4sap_15.3 -> 34.240.0.107",
+]
+
+
+----
 test_machines_A = [
   "sschmidt-testlandscape-A-0 : t3.nano/sles4sap_15 -> 34.245.45.135",
   "sschmidt-testlandscape-A-1 : t3.nano/sles4sap_15 -> 54.154.207.236",
@@ -248,17 +256,8 @@ test_machines_A = [
   "sschmidt-testlandscape-A-6 : t3.nano/sles4sap_15.3 -> 34.240.45.133",
   "sschmidt-testlandscape-A-7 : t3.nano/sles4sap_15.3 -> 34.244.251.98",
 ]
+----
 
-test_machines_B = [
-  "sschmidt-testlandscape-B-0 : standard_b1/sles4sap_15 -> 137.116.221.168",
-  "sschmidt-testlandscape-B-1 : standard_b1/sles4sap_15 -> 20.224.248.88",
-  "sschmidt-testlandscape-B-2 : standard_b1/sles4sap_15.1 -> 20.224.255.211",
-  "sschmidt-testlandscape-B-3 : standard_b1/sles4sap_15.1 -> 20.224.254.154",
-  "sschmidt-testlandscape-B-4 : standard_b1/sles4sap_15.2 -> 20.224.252.93",
-  "sschmidt-testlandscape-B-5 : standard_b1/sles4sap_15.2 -> 20.224.249.16",
-  "sschmidt-testlandscape-B-6 : standard_b1/sles4sap_15.3 -> 13.81.68.71",
-  "sschmidt-testlandscape-B-7 : standard_b1/sles4sap_15.3 -> 20.224.255.224",
-]
 
 test_machines_C = [
   "sschmidt-testlandscape-C-1 : micro/sles_15 -> 172.31.136.48",

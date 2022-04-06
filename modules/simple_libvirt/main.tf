@@ -3,7 +3,7 @@
 locals {
   # URI to libvirt.
   libvirt_uri = var.location
-  maschine_ids = toset(keys(var.machines))
+  machine_ids = toset(keys(var.machines))
   used_os = toset([for key, val in var.machines: val[1]])
   image_map   = yamldecode(file("${path.root}/images_libvirt.yaml"))
   sizing_map  = yamldecode(file("${path.root}/sizing_libvirt.yaml"))
@@ -22,10 +22,6 @@ terraform {
     libvirt = {
       source  = "dmacvicar/libvirt"
       version = "~> 0.6.14"
-    }
-    metadata = {
-      source = "skeggse/metadata"
-      version = "~> 0.2.0"
     }
   }
   required_version = ">= 1.1.0"
@@ -78,7 +74,7 @@ resource "libvirt_cloudinit_disk" "cloudinit_disk" {
 
 # Create the machine.
 resource "libvirt_domain" "domain" {
-  for_each  = local.maschine_ids
+  for_each  = local.machine_ids
   name      = "${var.name}-${each.key}"
   memory    = lookup(local.sizing_map[var.machines[each.key][0]], "memory")
   vcpu      = lookup(local.sizing_map[var.machines[each.key][0]], "vcpu")
@@ -90,18 +86,5 @@ resource "libvirt_domain" "domain" {
   disk {
     #volume_id = element(libvirt_volume.volume.*.id, count.index)
     volume_id = libvirt_volume.volume[each.key].id
-  }
-}
-
-# Meta data to store some information of each vm for output.
-resource "metadata_value" "machine_info" {
-  for_each  = local.maschine_ids
-  update = true
-  inputs = {
-    id         = libvirt_domain.domain[each.key].id
-    name       = libvirt_domain.domain[each.key].name
-    size       = var.machines[each.key][0]
-    image      = var.machines[each.key][1]
-    ip_address = libvirt_domain.domain[each.key].network_interface[0].addresses[0]
   }
 }

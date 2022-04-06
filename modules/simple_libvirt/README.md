@@ -74,7 +74,7 @@ The following arguments are supported:
   Map with unique `id` as key and tuples with the size and image data for the instance: `[size, image]` as data.
 
   Id is used as an identifier for various resources. The machine name is a catenation of `name` and `id`.
-  **Take care, that the `key` is unique! Terraform will always take silently the last hit. "Renaming" of machines can lead to strange effects and might brake your environmant!**
+  **Take care, that the `key` is unique! Terraform will always take silently the last hit. "Renaming" of machines can lead to strange effects and might brake your environment!**
 
   Size is an identifier to select the sizing for the virtual machine. 
   The identifiers must be provided by the file `sizing_libvirt.yaml` in the project root directory, which 
@@ -88,9 +88,7 @@ The following arguments are supported:
 
   An example can be found in the modules directory.
 
-  The idea to use a mapping instead of the provider identifiers is to provide a way to have common identifiers for all providers. 
-  For example It would be possible to use always a size of 'medium' or an image  of 'sles12_sp1' which get translated
-  to the correct identifiers for AWS, Azure and libvirt.  
+  Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure and libvirt.  
 
 * `keymap` (optional)
 
