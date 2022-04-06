@@ -193,16 +193,13 @@ module "test_landscape_B" {
 module "test_landscape_C" {
   source   = "../../modules/simple_libvirt"
   name     = "sschmidt-testlandscape-C"
-  machines = [
-    ["micro", "sles_15"],
-    ["micro", "sles_15"],
-    ["micro", "sles_15.1"],
-    ["micro", "sles_15.1"],
-    ["micro", "sles_15.2"],
-    ["micro", "sles_15.2"],
-    ["micro", "sles_15.3"],
-    ["micro", "sles_15.3"]
-  ]
+  machines = {
+    1    = ["micro", "sles_15"],
+    2    = ["micro", "sles_15.1"],
+    "3a" = ["micro", "sles_15.1"],
+    "3b" = ["micro", "sles_15.2"],
+    4    = ["micro", "sles_15.3"]
+  }
   admin_user_key                = "ssh-rsa ..."
   subscription_registration_key = "INTERNAL-USE-ONLY-f1..."
   enable_root_login             = true
@@ -264,14 +261,11 @@ test_machines_B = [
 ]
 
 test_machines_C = [
-  "sschmidt-testlandscape-C-0 : micro/sles_15 -> 172.31.191.116",
-  "sschmidt-testlandscape-C-1 : micro/sles_15 -> 172.31.83.231",
-  "sschmidt-testlandscape-C-2 : micro/sles_15.1 -> 172.31.30.92",
-  "sschmidt-testlandscape-C-3 : micro/sles_15.1 -> 172.31.0.52",
-  "sschmidt-testlandscape-C-4 : micro/sles_15.2 -> 172.31.185.59",
-  "sschmidt-testlandscape-C-5 : micro/sles_15.2 -> 172.31.63.76",
-  "sschmidt-testlandscape-C-6 : micro/sles_15.3 -> 172.31.205.179",
-  "sschmidt-testlandscape-C-7 : micro/sles_15.3 -> 172.31.253.48",
+  "sschmidt-testlandscape-C-1 : micro/sles_15 -> 172.31.136.48",
+  "sschmidt-testlandscape-C-2 : micro/sles_15.1 -> 172.31.157.238",
+  "sschmidt-testlandscape-C-3a : micro/sles_15.1 -> 172.31.178.175",
+  "sschmidt-testlandscape-C-3b : micro/sles_15.2 -> 172.31.46.93",
+  "sschmidt-testlandscape-C-4 : micro/sles_15.3 -> 172.31.115.212",
 ]
 ```
 

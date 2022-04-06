@@ -1,7 +1,7 @@
-# simple_azure
+# simple_libvirt
 
 Creates a bunch of virtual machines via libvirt.
-It makes use of https://registry.terraform.io/providers/dmacvicar/libvirt/latest/docs and https://registry.terraform.io/providers/skeggse/metadata/latest/docs.
+It makes use of https://registry.terraform.io/providers/dmacvicar/libvirt/latest/docs.
 
 
 ## Example Usage
@@ -20,17 +20,14 @@ module "simple_libvirt" {
   # The name prefix for our resources.
   name = "sschmidt-spielwiese"
 
-  # List of the machines to create. Each machine is a tuple of 'size' and 'image'.
-  machines = [
-    ["micro", "sles_15"],
-    ["micro", "sles_15"],
-    ["micro", "sles_15.1"],
-    ["micro", "sles_15.1"],
-    ["micro", "sles_15.2"],
-    ["micro", "sles_15.2"],
-    ["micro", "sles_15.3"],
-    ["micro", "sles_15.3"]
-  ]
+  # Map of the machines to create. Each machine has a unique id with a tuple of 'size' and 'image'.
+  machines = {
+    1    = ["micro", "sles_15"],
+    2    = ["micro", "sles_15.1"],
+    "3a" = ["micro", "sles_15.1"],
+    "3b" = ["micro", "sles_15.2"],
+    4    = ["micro", "sles_15.3"]
+  }
 
   # We need a German keyboard.
   keymap = "de-latin1-nodeadkeys"
@@ -74,7 +71,10 @@ The following arguments are supported:
 
 * `machines` (mandatory)
 
-  List of tuples with the size and image data for the instance: `[size, image]`
+  Map with unique `id` as key and tuples with the size and image data for the instance: `[size, image]` as data.
+
+  Id is used as an identifier for various resources. The machine name is a catenation of `name` and `id`.
+  **Take care, that the `key` is unique! Terraform will always take silently the last hit. "Renaming" of machines can lead to strange effects and might brake your environmant!**
 
   Size is an identifier to select the sizing for the virtual machine. 
   The identifiers must be provided by the file `sizing_libvirt.yaml` in the project root directory, which 

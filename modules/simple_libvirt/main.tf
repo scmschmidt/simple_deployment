@@ -3,8 +3,8 @@
 locals {
   # URI to libvirt.
   libvirt_uri = var.location
-  number_of_instances = length(var.machines)
-  used_os = toset([for maschine in var.machines: maschine[1]])
+  maschine_ids = toset(keys(var.machines))
+  used_os = toset([for key, val in var.machines: val[1]])
   image_map   = yamldecode(file("${path.root}/images_libvirt.yaml"))
   sizing_map  = yamldecode(file("${path.root}/sizing_libvirt.yaml"))
   cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
@@ -63,10 +63,10 @@ resource "libvirt_volume" "master" {
 
 # Each virtual machine needs its own disk pointing to a master.
 resource "libvirt_volume" "volume" {
-  count          = local.number_of_instances
-  name           = "${var.name}-${var.machines[count.index][1]}-${count.index}.qcow2"
-  base_volume_id = libvirt_volume.master[var.machines[count.index][1]].id
-  size           = lookup(local.sizing_map[var.machines[count.index][0]], "disksize") != 0 ? lookup(local.sizing_map[var.machines[count.index][0]], "disksize") * 1024 * 1024 : null
+  for_each       = local.maschine_ids
+  name           = "${var.name}-${var.machines[each.key][1]}-${each.key}.qcow2"
+  base_volume_id = libvirt_volume.master[var.machines[each.key][1]].id
+  size           = lookup(local.sizing_map[var.machines[each.key][0]], "disksize") != 0 ? lookup(local.sizing_map[var.machines[each.key][0]], "disksize") * 1024 * 1024 : null
 }
 
 # Use cloudinit to do some preparation.
@@ -78,29 +78,30 @@ resource "libvirt_cloudinit_disk" "cloudinit_disk" {
 
 # Create the machine.
 resource "libvirt_domain" "domain" {
-  count = local.number_of_instances
-  name  = "${var.name}-${count.index}"
-  memory    = lookup(local.sizing_map[var.machines[count.index][0]], "memory")
-  vcpu      = lookup(local.sizing_map[var.machines[count.index][0]], "vcpu")
+  for_each  = local.maschine_ids
+  name      = "${var.name}-${each.key}"
+  memory    = lookup(local.sizing_map[var.machines[each.key][0]], "memory")
+  vcpu      = lookup(local.sizing_map[var.machines[each.key][0]], "vcpu")
   cloudinit = libvirt_cloudinit_disk.cloudinit_disk.id
   network_interface {
     network_name   = var.name
     wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
   }
   disk {
-    volume_id = element(libvirt_volume.volume.*.id, count.index)
+    #volume_id = element(libvirt_volume.volume.*.id, count.index)
+    volume_id = libvirt_volume.volume[each.key].id
   }
 }
 
 # Meta data to store some information of each vm for output.
 resource "metadata_value" "machine_info" {
-  count  = local.number_of_instances
+  for_each  = local.maschine_ids
   update = true
   inputs = {
-    id         = libvirt_domain.domain[count.index].id
-    name       = libvirt_domain.domain[count.index].name
-    size       = var.machines[count.index][0]
-    image      = var.machines[count.index][1]
-    ip_address = libvirt_domain.domain[count.index].network_interface[0].addresses[0]
+    id         = libvirt_domain.domain[each.key].id
+    name       = libvirt_domain.domain[each.key].name
+    size       = var.machines[each.key][0]
+    image      = var.machines[each.key][1]
+    ip_address = libvirt_domain.domain[each.key].network_interface[0].addresses[0]
   }
 }
