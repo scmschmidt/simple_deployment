@@ -59,7 +59,7 @@ resource "libvirt_volume" "master" {
 
 # Each virtual machine needs its own disk pointing to a master.
 resource "libvirt_volume" "volume" {
-  for_each       = local.maschine_ids
+  for_each       = local.machine_ids
   name           = "${var.name}-${var.machines[each.key][1]}-${each.key}.qcow2"
   base_volume_id = libvirt_volume.master[var.machines[each.key][1]].id
   size           = lookup(local.sizing_map[var.machines[each.key][0]], "disksize") != 0 ? lookup(local.sizing_map[var.machines[each.key][0]], "disksize") * 1024 * 1024 : null

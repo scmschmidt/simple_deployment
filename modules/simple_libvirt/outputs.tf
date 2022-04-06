@@ -2,6 +2,7 @@ output "machines" {
   value       = libvirt_domain.domain
   description = "The data of the deployed machines."
   sensitive   = false
+}
 
 output "machine_info" {
   value       = {
