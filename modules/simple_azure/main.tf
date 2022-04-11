@@ -31,6 +31,19 @@ provider "azurerm" {
 resource "azurerm_resource_group" "resource_group" {
   name     = "${var.name}-resource_group"
   location = var.location
+  
+  lifecycle {
+    ignore_changes = [ 
+      tags["Cost Center"],
+      tags["Department"],
+      tags["Environment"],
+      tags["Finance Business Partner"],
+      tags["General Ledger Code"],
+      tags["Group"],
+      tags["Owner"],
+      tags["Stakeholder"]
+    ]
+  }
 }
 
 # Create virtual network.
@@ -39,6 +52,19 @@ resource "azurerm_virtual_network" "network" {
   address_space       = [var.subnet]
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
+
+  lifecycle {
+    ignore_changes = [ 
+      tags["Cost Center"],
+      tags["Department"],
+      tags["Environment"],
+      tags["Finance Business Partner"],
+      tags["General Ledger Code"],
+      tags["Group"],
+      tags["Owner"],
+      tags["Stakeholder"]
+    ]
+  }
 }
 
 # Create subnet.
@@ -56,6 +82,19 @@ resource "azurerm_public_ip" "public_ip" {
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
   allocation_method   = "Dynamic"
+
+  lifecycle {
+    ignore_changes = [ 
+      tags["Cost Center"],
+      tags["Department"],
+      tags["Environment"],
+      tags["Finance Business Partner"],
+      tags["General Ledger Code"],
+      tags["Group"],
+      tags["Owner"],
+      tags["Stakeholder"]
+    ]
+  }
 }
 
 # Create network security group and rule.
@@ -75,6 +114,19 @@ resource "azurerm_network_security_group" "security_group" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  lifecycle {
+    ignore_changes = [ 
+      tags["Cost Center"],
+      tags["Department"],
+      tags["Environment"],
+      tags["Finance Business Partner"],
+      tags["General Ledger Code"],
+      tags["Group"],
+      tags["Owner"],
+      tags["Stakeholder"]
+    ]
+  }
 }
 
 # Create network interfaces.
@@ -89,6 +141,19 @@ resource "azurerm_network_interface" "network_interface" {
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public_ip[each.key].id
+  }
+
+  lifecycle {
+    ignore_changes = [ 
+      tags["Cost Center"],
+      tags["Department"],
+      tags["Environment"],
+      tags["Finance Business Partner"],
+      tags["General Ledger Code"],
+      tags["Group"],
+      tags["Owner"],
+      tags["Stakeholder"]
+    ]
   }
 }
 
@@ -132,5 +197,18 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
     offer     = split(":", local.image_map[var.machines[each.key][1]])[1]
     sku       = split(":", local.image_map[var.machines[each.key][1]])[2]
     version   = "latest"
+  }
+
+  lifecycle {
+    ignore_changes = [ 
+      tags["Cost Center"],
+      tags["Department"],
+      tags["Environment"],
+      tags["Finance Business Partner"],
+      tags["General Ledger Code"],
+      tags["Group"],
+      tags["Owner"],
+      tags["Stakeholder"]
+    ]
   }
 }
