@@ -8,10 +8,10 @@ output "machine_info" {
   value       = {
     for id, data in libvirt_domain.domain:
       "${data.name}" => {
-        "id"         = data.id,
-        "size"       = var.machines[id][0],
+        "id"         = data.id
+        "size"       = var.machines[id][0]
         "image"      = var.machines[id][1]
-        "ip_address" = data.network_interface[0].addresses[0]
+        "ip_address" = try(data.network_interface[0].addresses[0], "-")
       }
     }
   description = "Some aggregated data about deployed machines."
