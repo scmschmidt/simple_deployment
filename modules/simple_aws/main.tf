@@ -86,4 +86,9 @@ resource "aws_instance" "instance" {
   tags = {
     Name = "${var.name}-${each.key}"
   }
+
+  # Shutdowned machines shall not lead to a redeployment on apply.
+  lifecycle {
+    ignore_changes = [associate_public_ip_address]
+  }
 }

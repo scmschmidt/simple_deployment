@@ -262,6 +262,22 @@ test_machines_C = [
 ]
 ```
 
+## Peculiarities
+
+### simple_libvirt
+
+- If a machine was shutdowned a `terraform apply` will restart it. The new IP is not known and represented by an empty string. Just run `terraform refresh` to update the IP address.
+
+### simple_azure
+
+- Contrary to the other providers a shutdowned machine will not be detected.
+
+### simple_aws
+
+- A shutdowned machine would normally get redeployed, because the IP address is not present anymore. 
+  We ignoring changes to the IP address, therefore shutdowned machines get ignored an represented with an empty IP address. If they have been restarted, an additional `terraform apply` or `terraform refresh` is necessary to update the state. Keep in mind, that the newly started machine will get a new IP address!
+  
+
 ## Changelog
 
 [Link to the CHANGELOG](CHANGELOG.md)
