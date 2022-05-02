@@ -19,9 +19,10 @@ locals {
 
 terraform {
   required_providers {
+    # Pinned dmacvicar/libvirt to version 0.6.10 because later version have a bug which can prevent SSH-based libvirt connections: https://github.com/dmacvicar/terraform-provider-libvirt/issues/864
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "~> 0.6.14"
+      version = "= 0.6.10"
     }
   }
   required_version = ">= 1.1.0"
