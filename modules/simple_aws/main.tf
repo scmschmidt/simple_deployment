@@ -61,6 +61,15 @@ resource "aws_security_group" "security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+
+  # Incoming ICMP
+  ingress {
+    from_port = -1
+    to_port = -1
+    protocol = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Outgoing traffic
   egress {
     from_port   = 0
