@@ -7,3 +7,4 @@
 | 12.04.2022 | v1.3 | All three modules can handle stopped machines (in a different way).<br>Consecutive applies on Azure do not lead to re-deployments anymore due to tag changes by some automatism on Azure side. |
 | 12.04.2022 | v1.4 | Pinned dmacvicar/libvirt to version 0.6.10 because later version have a bug which can prevent SSH-based libvirt connections: https://github.com/dmacvicar/terraform-provider-libvirt/issues/864 |
 | 28.07.2022 | v1.5 | Added security rule to allow ICMP on AWS (Azure is still without ICMP, since I have trouble login in today. :-/ ) |
+| 28.07.2022 | v1.6 | Added security rule to allow ICMP on Azure. |
