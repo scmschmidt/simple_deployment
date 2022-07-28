@@ -15,6 +15,7 @@ In short, my requirements are:
   * defining the (SLE) operating system,
   * **minimal** influence on machine sizing (memory, CPUs, disk size, etc.),
   * amount of machines.
+* ICMP and SSH are allowed
 * root access to the machine by ssh key
 * logon user with ssh key
 * registration on the SCC (or other registration server)
