@@ -8,3 +8,4 @@
 | 12.04.2022 | v1.4 | Pinned dmacvicar/libvirt to version 0.6.10 because later version have a bug which can prevent SSH-based libvirt connections: https://github.com/dmacvicar/terraform-provider-libvirt/issues/864 |
 | 28.07.2022 | v1.5 | Added security rule to allow ICMP on AWS (Azure is still without ICMP, since I have trouble login in today. :-/ ) |
 | 28.07.2022 | v1.6 | Added security rule to allow ICMP on Azure. |
+| 29.07.2022 | v1.7 | Changed sources in the examples from local to remote (git::https://...) and removed the doc parts telling that it doesn't work. Suddenly it does. No idea why, so I just accept it as a lucky turn. |

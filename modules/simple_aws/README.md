@@ -9,8 +9,7 @@ It makes use of https://registry.terraform.io/providers/hashicorp/aws/latest/doc
 module "simple_aws" {
 
   # Path to the module.
-  #source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_aws" # Does not work currently. :-/
-  source = "./modules/simple_aws"  # Point to the module directory after you have cloned/downloaded the repo.
+  source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_aws"
   
   # Region and used subnet.
   location = "eu-central-1"
