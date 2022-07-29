@@ -10,8 +10,7 @@ It makes use of https://registry.terraform.io/providers/dmacvicar/libvirt/latest
 module "simple_libvirt" {
 
   # Path to the module.
-  #source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_libvirt" # Does not work currently. :-/
-  source = "./modules/simple_libvirt"   # Point to the module directory after you have cloned/downloaded the repo.
+  source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_libvirt"
   
   # URI to libvirtd and used subnet.
   location = qemu:///system"

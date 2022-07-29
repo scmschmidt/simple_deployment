@@ -27,9 +27,6 @@ I'll do bug fixing of cause and also maybe enhance it a bit, but only to the ext
 
 You don't need to clone this repository. It would be enough to reference the git repo in your terraform plan like shown in the examples. Terraform will download and install the modules on initialization.
 
-> :exclamation: Sadly this does not work currently and I still have to figure out why!
-> For now clone the repo and use the local path to the module directory you want to use.
-
 If you don't need a provider (meaning, libvirt, Azure or AWS), you can skip the installation part for it. Of cause you can't use the module later on.
 
 ###  Install `terraform`
@@ -154,7 +151,7 @@ Anyways, you need at least a minor understanding of terraform.
 # Our test landscapes with two machines per SLES for SAP 15 release on AWS (A), Azure (B) and libvirt (C).
 
 module "test_landscape_A" {
-  source   = "../../modules/simple_aws"
+  source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_aws"
   location = "eu-west-1"
   name     = "sschmidt-testlandscape-A"
   machines = {
@@ -170,7 +167,7 @@ module "test_landscape_A" {
 }
 
 module "test_landscape_B" {
-  source   = "../../modules/simple_azure"
+  source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_azure"
   location = "westeurope"
   name     = "sschmidt-testlandscape-B"
   machines = {
@@ -186,7 +183,7 @@ module "test_landscape_B" {
 }
 
 module "test_landscape_C" {
-  source   = "../../modules/simple_libvirt"
+  source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_libvirt"
   name     = "sschmidt-testlandscape-C"
   machines = {
     1    = ["micro", "sles_15"],
