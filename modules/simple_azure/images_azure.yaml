@@ -5,6 +5,7 @@
 # the format <publisher>:<offer>:<sku>  (Example: SUSE:sles-15-sp3-byos:gen2)
 # A list of all images can be retrieved with:
 # 'az vm image list --output table --all [--publisher PUBLISHER] [--offer OFFER] , [--sku SKU]'
+# Alternatively https://pint.suse.com can be used to create such a list.
 #
 # <label>: <publisher>:<offer>:<sku>
 

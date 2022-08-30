@@ -4,6 +4,7 @@
 # The labels can be chosen freely and should reference the AMI in the particular region.
 # A list of all (SUSE) images can be retrieved with:
 # 'aws ec2 describe-images --region=<region> --filters 'Name=name,Values=suse-sles*' --output table'
+# Alternatively https://pint.suse.com can be used to create such a list.
 #
 # <region>
 #   <label>: <ami>
