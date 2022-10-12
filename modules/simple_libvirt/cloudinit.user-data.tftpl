@@ -69,9 +69,19 @@ write_files:
       [[ $(localectl --no-pager status | grep Keymap) =~ ${keymap} ]] || /usr/bin/localectl set-keymap "${keymap}"
 
       # Register the SLES.
-      # (On Azure the cleaning was necessary)
       SUSEConnect --clean
-      SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
+      for ((c=1;c<=6;c++)) ; do  
+        if [ "${subscription_registration_key}" == '-' ] ; then 
+          SUSEConnect  --url "${registration_server}"
+        else
+          SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
+        fi 
+        if SUSEConnect --status | grep -q '"status":"Registered"}' ; then
+          break
+        else 
+          sleep $(( c*3 ))
+        fi 
+      done
 
 runcmd:
   - /run/provision.sh
