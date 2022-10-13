@@ -70,18 +70,13 @@ write_files:
 
       # Register the SLES.
       SUSEConnect --clean
-      for ((c=1;c<=6;c++)) ; do  
+      if [ "${registration_server}" != '-' ] ; then
         if [ "${subscription_registration_key}" == '-' ] ; then 
           SUSEConnect  --url "${registration_server}"
         else
           SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
-        fi 
-        if SUSEConnect --status | grep -q '"status":"Registered"}' ; then
-          break
-        else 
-          sleep $(( c*3 ))
-        fi 
-      done
-
+        fi
+      fi
+      
 runcmd:
   - /run/provision.sh
