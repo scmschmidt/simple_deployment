@@ -125,7 +125,7 @@ The following arguments are supported:
   
 * `registration_server` (optional)
 
-  URL to the registartion server.
+  URL to the registration server. A "-" as value skips the registration.
    
   Default:      https://scc.suse.com
    
