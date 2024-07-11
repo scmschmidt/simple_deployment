@@ -26,6 +26,13 @@ terraform {
 provider "aws" {
   profile = "default"
   region  = var.location
+  default_tags {
+   tags = {
+    owner = var.owner_tag
+    managed_by = var.managed_by_tag
+    application = var.application_tag
+   }
+  }
 }
 
 # For the VPC we need the available availability zones.

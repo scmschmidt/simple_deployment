@@ -11,6 +11,11 @@ locals {
                                                                 registration_server = var.registration_server,
                                                                 enable_root_login = var.enable_root_login ? 1 : 0
                                                               })
+  tags = {
+    owner = var.owner_tag
+    managed_by = var.managed_by_tag
+    application = var.application_tag
+  }
 }
 
 terraform {
@@ -44,6 +49,7 @@ resource "azurerm_resource_group" "resource_group" {
       tags["Stakeholder"]
     ]
   }
+  tags = local.tags
 }
 
 # Create virtual network.
@@ -52,7 +58,7 @@ resource "azurerm_virtual_network" "network" {
   address_space       = [var.subnet]
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
-
+  tags                = local.tags
   lifecycle {
     ignore_changes = [ 
       tags["Cost Center"],
@@ -82,6 +88,7 @@ resource "azurerm_public_ip" "public_ip" {
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
   allocation_method   = "Dynamic"
+  tags                = local.tags
 
   lifecycle {
     ignore_changes = [ 
@@ -127,6 +134,8 @@ resource "azurerm_network_security_group" "security_group" {
     destination_address_prefix  = "*"
   }
 
+  tags                = local.tags
+
   lifecycle {
     ignore_changes = [ 
       tags["Cost Center"],
@@ -155,6 +164,7 @@ resource "azurerm_network_interface" "network_interface" {
     public_ip_address_id          = azurerm_public_ip.public_ip[each.key].id
   }
 
+  tags                = local.tags
   lifecycle {
     ignore_changes = [ 
       tags["Cost Center"],
@@ -211,6 +221,7 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
     version   = "latest"
   }
 
+  tags                = local.tags
   lifecycle {
     ignore_changes = [ 
       tags["Cost Center"],

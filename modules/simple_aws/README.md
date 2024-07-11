@@ -80,6 +80,23 @@ The following arguments are supported:
 
   Name of the environment. It is used throughout the installation as prefix for the resources.
 
+* `owner_tag`  (optional)
+
+  Owner of the environment. Used as tag for resources.
+
+  Default: ""
+
+* `managed_by_tag`  (optional)
+
+  Describes what manages the environment. Used as tag for resources.
+  
+  Default: terraform
+
+* `application_tag`  (optional)
+  Application which uses the resources. Used as tag for resources.
+  
+  Default: ""
+
 * `machines` (mandatory)
 
   Map with unique `id` as key and tuples with the size and image data for the instance: `[size, image]` as data.

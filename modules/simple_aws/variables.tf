@@ -14,6 +14,24 @@ variable "name" {
   type        = string
 }
 
+variable "owner_tag" {
+  description = "Owner of the environment. Used as tag for resources."
+  type        = string
+  default     = ""
+}
+
+variable "managed_by_tag" {
+  description = "Describes what manages the environment. Used as tag for resources."
+  type        = string
+  default     = "terraform"
+}
+
+variable "application_tag" {
+  description = "Application which uses the resources. Used as tag for resources."
+  type        = string
+  default     = ""
+}
+
 variable "machines" {
   description = "Map of machine definitions to deploy. Each key is a unique identifier with a tupel of size identifier and image identifier as value."
   type        = map(list(string))
