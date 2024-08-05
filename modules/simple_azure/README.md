@@ -36,7 +36,7 @@ module "simple_azure" {
   admin_user_key = "ssh-rsa ..." 
 
   # Server and key to register the SLES.
-  subscription_registration_key = "***REMOVED***"
+  subscription_registration_key = "..."
   registration_server           = "https://scc.suse.com"
 
   # We also want to logon as root.
