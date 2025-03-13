@@ -68,6 +68,9 @@ write_files:
       # Also, for unknown reasons, the cloud-init keyboard module didn't work.)
       [[ $(localectl --no-pager status | grep Keymap) =~ ${keymap} ]] || /usr/bin/localectl set-keymap "${keymap}"
 
+      # Set hostname.
+      hostnamectl set-hostname "ip-`ip -o a s | grep 'scope global' | tr -s ' ' | cut -d ' ' -f 4 | cut -d / -f 1 | tr '.' '-'`"
+
       # Register the SLES.
       SUSEConnect --clean
       if [ "${registration_server}" != '-' ] ; then
