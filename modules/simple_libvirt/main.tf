@@ -33,7 +33,7 @@ provider "libvirt" {
   uri = local.libvirt_uri
 }
 
-# We creaete our own network for all machines with dhcp and NAT. 
+# We create our own network for all machines with dhcp and NAT. 
 resource "libvirt_network" "network" {
   name      = var.name
   mode      = "nat"
@@ -87,5 +87,8 @@ resource "libvirt_domain" "domain" {
   disk {
     #volume_id = element(libvirt_volume.volume.*.id, count.index)
     volume_id = libvirt_volume.volume[each.key].id
+  }
+  cpu = {
+    mode = "host-passthrough"
   }
 }
