@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+recovery='RECOVERY'    # Name for snappshot to go to back later.
+
+# Get latest recovery snapshot.
+id=$(grub2-once --list | grep ",${recovery}" | tr -s ' ' | cut -d ' ' -f 2 | tail -n 1)
+if [ -z "${id}" ] ; then
+    echo "Could not find recovery entry for snapshot \"${baseline}\"!" 2>&1
+    exit 1
+fi
+
+# Boot into recovery snapshot
+grub2-once ${id}
+reboot
