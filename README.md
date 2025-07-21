@@ -1,6 +1,7 @@
 # simple_deployment
 
 Some Terraform modules to simply rollout machines on libvirt, AWS and Azure with a unified configuration.
+For bare-metal an SSH/ based module is available to manage btrfs snapshots.
 
 ## Motivation & Disclaimer
 
@@ -21,7 +22,9 @@ In short, my requirements are:
 * registration on the SCC (or other registration server)
 * (a bit more, but this was not doable on libvirt, AWS and Azure all together, so I plan to use Ansible later on)
 
-I'll do bug fixing of cause and also maybe enhance it a bit, but only to the extend of my needs. There are no plans to add stuff for more complex deployments. Feel free to fork and work on your own!  
+I'll do bug fixing of cause and also maybe enhance it a bit, but only to the extend of my needs. There are no plans to add stuff for more complex deployments. Feel free to fork and work on your own!
+
+The bare-metal module is different because it just manages btfs snapshots.
 
 ## Installation
 
@@ -136,6 +139,11 @@ export ARM_TENANT_ID="<tenant>"
 
 How to set this up, is beyond this guide.
 
+
+### Setup bare-metal
+
+sdsd
+
 ## Usage
 
 Here a brief example how to setup some test machines on libvirt, AWS and Azure.
@@ -144,6 +152,7 @@ You can find detailed descriptions about how to use the modules here:
 * [simple_libvirt](modules/simple_libvirt/README.md)
 * [simple_aws](modules/simple_aws/README.md)
 * [simple_azure](modules/simple_azure/README.md)
+* [simple_baremetal](modules/simple_baremetal/README.md)
 
 Anyways, you need at least a minor understanding of terraform.
 
