@@ -1,7 +1,25 @@
 # simple_baremetal
 
-Contrary to the other modules, "simple_baremetal" only manages btrfs snapshots  of already installed machines.
-The idea is to get back to a defined state after testing, which normally is done by redeploying VMs on KVM or Cloud providers.
+Contrary to the other modules, "simple_baremetal" only manages btrfs snapshots of already installed machines.
+The idea is to get back to a defined state after testing, which normally is done by re-deploying VMs on KVM or Cloud providers.
+
+The snapshot handling works as follows:
+
+On apply:
+  - A snapshot "RECOVERY" is created to return to on destroy.
+  - A roll back to a snapshot called "BASELINE" is done, which must exist.
+ 
+On destroy:
+  - A roll back to the latest recovery snapshot is done, created on apply.
+
+Rolling back to a snapshot always requires two reboots!
+
+Idempotence is tried to ensured by state files on the target systems.
+
+A baseline snapshot must be prepared: `snapper --config root create -d BASELINE`. 
+
+> :exclamation: The OS must support snapshots via `snapper` and `GRUB` must detect bootable snapshots as described in the SLES documentation! 
+
 
 ## Example Usage
 

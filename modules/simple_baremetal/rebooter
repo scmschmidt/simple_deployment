@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+#
+#   rebooter  - Reboots a machine and waits for its return (SSH login)
+#
+#   The script requires, that the user running it has a key-based login on the target machine.
+#   
+#   The script honors the following environment variables:
+#
+#       SSH_OPTIONS         SSH options to make the connection to the host.
+#       GO_DOWN_TIMEOUT     Seconds to wait for the host become unreachable (ping).
+#       COME_UP_TIMEOUT     Seconds to wait for the host to become reachable again (ping).
+#       SYSTEM_TIMEOUT      Seconds to wait for the system to be in running state (systemctl is-syystem-running)
+
+set -u 
+
+# One parameter: the target host (with optional user)
+if [ $# -ne 1 ] ; then
+    echo "Usage: ${0##*/} [USER@]HOST" >&2
+    exit 1
+fi
+if [[ "${1}" =~ @ ]] ; then 
+    target="${1}"
+else 
+    target="${USER}@${1}"
+fi 
+
+# Setting defaults.
+: ${SSH_OPTIONS:=''}
+: ${GO_DOWN_TIMEOUT:=45}
+: ${COME_UP_TIMEOUT:=120}
+: ${LOGIN_TIMEOUT:=40}
+: ${SYSTEM_TIMEOUT:=30}
+
+# Reboot host.
+echo "Sending reboot to ${target#*@}"
+cmd="ssh ${SSH_OPTIONS} ${target} '(sleep 1 ; reboot) &'"
+output=$(eval ${cmd} 2>&1) ; exit=$?
+if [ ${exit} -ne 0 ] ; then
+    echo "SSH to ${host} failed: ${output}" >&2
+    exit 2
+fi
+
+# Try to connect until host is gone.
+echo -n "Waiting for ${target#*@} becoming unreachable... "
+c=${GO_DOWN_TIMEOUT}
+cmd="timeout 3 ssh ${SSH_OPTIONS} -o ConnectTimeout=3 ${target} :" 
+while eval ${cmd} > /dev/null 2>&1 ; do
+    echo -n "${c} "
+    sleep 1
+    (( c-- ))
+    if [ ${c} -eq 0 ] ; then
+        echo "GO_DOWN_TIMEOUT Timeout reached! Exiting." >&2
+        exit 3
+    fi
+done
+echo
+
+# Wait until host is back.
+echo -n "Waiting for ${target#*@} becoming reachable... "
+c=${COME_UP_TIMEOUT}
+cmd="ssh ${SSH_OPTIONS} -o ConnectTimeout=4 ${target} :"
+while ! eval ${cmd} > /dev/null 2>&1  ; do
+    echo -n "${c} "
+    sleep 1
+    (( c-- ))
+        if [ ${c} -eq 0 ] ; then
+        echo "COME_UP_TIMEOUT Timeout reached! Exiting." >&2
+        exit 4
+    fi
+done
+echo
+
+# systemd has to be in status running/degraded.
+echo -n "Waiting for ${target#*@} to get into running state... "
+c=${SYSTEM_TIMEOUT}
+cmd="ssh ${SSH_OPTIONS} ${target} 'systemctl is-system-running'"
+while : ; do
+    state=$(eval ${cmd})
+    [ "${state}" == "running" -o "${state}" == "degraded" ] && break
+    echo -n "${c} "
+    sleep 1
+    (( c-- ))
+        if [ ${c} -eq 0 ] ; then
+        echo "SYSTEM_TIMEOUT Timeout reached! Exiting." >&2
+        exit 6
+    fi
+done
+echo "System has reached state: ${state}"
+echo
+
+# Bye.
+exit 0

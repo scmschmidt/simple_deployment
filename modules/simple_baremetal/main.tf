@@ -31,10 +31,24 @@ resource "null_resource" "maschine" {
 # bastion_private_key	The contents of an SSH key file to use for the bastion host. These can be loaded from a file on disk using the file function.	The value of the private_key field.
   }
 
-  # Execution on apply.
+  # Execution on apply (in the order of appearance!).
   provisioner "remote-exec" {
-    script  = var.run_on_apply
+    script  = "${path.module}/boot2baseline"
   }
+
+  provisioner "local-exec" {
+    command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [ "snapper rollback" ]
+  }
+
+  provisioner "local-exec" {
+    command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
+  }
+
+
 
   # Execution on destroy.
   provisioner "remote-exec" {
@@ -42,4 +56,8 @@ resource "null_resource" "maschine" {
     script  = "${self.triggers.run_on_destroy}"
   }
 
+  provisioner "remote-exec" {
+    when    = destroy
+    inline = [ "rm -f /tmp/R" ]
+  }
 }
