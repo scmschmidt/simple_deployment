@@ -1,23 +1,18 @@
 #!/bin/bash
+
 set -e
+LANG=C
 
-# Check for baseline snapshot.
-if ! grub2-once --list | grep -q ',BASELINE)$' ; then
-    msg='No BASELINE boot entry found!'
-    logger -t simple_baremetal "${msg}"
-    echo "${msg}"
-    exit 1
-fi
-#sync
-#snapper --config root create -d RECOVERY
-msg='RECOVERY snapshot created.'
-logger -t simple_baremetal "${msg}"
-echo "${msg}"
+# Include shared functions.
+. "${0%*${0##*/}}include"
 
-# Boot into baseline snapshot
-grub2-once BASELINE
-msg='BASELINE snapshot created. Rebooting...'
-logger -t simple_baremetal "${msg}"
-echo "${msg}"
-#systemctl reboot
-
+# Reboot if necessary.
+set_status  boot2baseline_initiate
+active=$(snapper --csvout  -c root list --disable-used-space --columns number,active | grep ',yes$' | cut -d ',' -f1)
+working_snapshot=$(< "${working_snapshot_file}")
+if [ ${active} -eq ${working_snapshot} ] ; then
+    log 'Reboot not required'
+    set_status  boot2baseline_not_needed
+    exit 0
+fid
+reboot

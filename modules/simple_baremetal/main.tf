@@ -33,20 +33,20 @@ resource "null_resource" "maschine" {
 
   # Execution on apply (in the order of appearance!).
   provisioner "remote-exec" {
-    script  = "${path.module}/boot2baseline"
+    script  = "${path.module}/create_baseline"
   }
 
-  provisioner "local-exec" {
-    command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
-  }
+  # provisioner "local-exec" {
+  #   command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
+  # }
 
-  provisioner "remote-exec" {
-    inline = [ "snapper rollback" ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [ "snapper rollback" ]
+  # }
 
-  provisioner "local-exec" {
-    command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
-  }
+  # provisioner "local-exec" {
+  #   command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
+  # }
 
 
 

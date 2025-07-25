@@ -1,0 +1,16 @@
+@startuml
+state rollback2baseline.baseline_rollback_planned
+state rollback2baseline.baseline_rollback_done
+state rollback2baseline.baseline_rollback_failed
+state boot2baseline.boot2baseline_not_needed
+state boot2baseline.boot2baseline_initiated
+
+[*] --> baseline_rollback_planned
+baseline_rollback_planned --> baseline_rollback_done
+baseline_rollback_planned --> baseline_rollback_failed
+
+baseline_rollback_done --> boot2baseline_initiated
+boot2baseline_initiated --> boot2baseline_not_needed
+
+@enduml
+

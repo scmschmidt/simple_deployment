@@ -1,0 +1,49 @@
+
+storage_dir='/var/lib/simple_baremetal'
+recovery_snapshot_file="${storage_dir}/recovery_snapshot"
+working_snapshot_file="${storage_dir}/working_snapshot"
+status_file="${storage_dir}/status"
+
+# Create storage directory and create status file (if not already there).
+mkdir -p "${storage_dir}"
+touch "${status_file}"
+
+function exit_on_error() {
+    log "${*}"
+    exit 1
+}
+
+function log() {
+    logger -t simple_baremetal "${*}"
+    echo "${*}"
+}
+
+function set_status() {
+    local status="${1}"
+    local current=$(< "${status_file}")
+    local fail=0
+
+    case "${status}" in
+        baseline_rollback_planned)
+            [ -n "${current}" ] && exit_on_error "Invalid current status \"${current}\" to enter \"${status}\"!. Exiting."
+            ;;
+        baseline_rollback_done)
+            [ "${current}" != 'baseline_rollback_planned' ] && fail=1
+            ;;
+        baseline_rollback_failed)
+            [ "${current}" != 'baseline_rollback_planned' ] && fail=1
+            ;; 
+        boot2baseline_initiated)
+            [ "${current}" != 'baseline_rollback_done' ] && fail=1
+            ;;
+        boot2baseline_not_needed)
+            [ "${current}" != 'boot2baseline_initiated' ] && fail=1
+            ;;        
+        *)  
+            exit_on_error "illegal status: ${status}"
+            ;;
+    esac 
+    [ ${fail} -eq 1 ] && exit_on_error "Invalid current status \"${current}\" to enter \"${status}\"!. Exiting."
+    echo "${status}" > "${status_file}"
+}
+
