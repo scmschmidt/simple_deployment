@@ -1,0 +1,22 @@
+#!/bin/bash
+
+LANG=C
+
+# Include shared functions.
+. /var/lib/simple_baremetal/scripts/include
+
+# Update snapshot variables.
+update_ss_vars
+
+# A reboot to the recovery snapshot should be done only if:
+#   - a recovery snapshot exists
+#   - the recovery snapshot is the default
+#   - the recovery snapshot is not the active one
+[ -z "${ss_recovery}" ] && exit_on_error "No recovery snapshot found! Exiting."   
+[ "${ss_recovery}" != "${ss_default}" ] && exit_on_error "The recovery snapshot is not the default! Exiting."
+[ "${ss_recovery}" == "${ss_active}" ] && exit_on_error "The recovery is already the active one! Exiting."
+
+# Reboot.
+log "Doing reboot..."
+reboot
+

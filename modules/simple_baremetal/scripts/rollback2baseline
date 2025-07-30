@@ -1,0 +1,31 @@
+#!/bin/bash
+
+LANG=C
+
+# Include shared functions.
+. /var/lib/simple_baremetal/scripts/include
+
+# Update snapshot variables.
+update_ss_vars
+
+# We rollback to the BASELINE snapshot only if:
+#   - a BASELINE snapshot exists
+#   - no working BASELINE snapshot exists
+#   - the working BASELINE snapshot is not the active snapshot
+[ -z "${ss_baseline}" ] && exit_on_error "No BASELINE snapshot found! Exiting."   
+[ -n "${ss_baseline_working}" ] && exit_on_success "A working BASELINE snapshot already exists! Exiting."
+[ "${ss_baseline_working}" == "${ss_active}" ] && exit_on_success "The working BASELINE snapshot is already the active one! Exiting."
+
+# Remember the active snapshot for recovery.
+echo "${ss_active}" > "${recovery_snapshot_file}"
+
+# Rollback to BASELINE snapshot.
+output=$(LANG=C snapper -c root rollback -d 'BASELINE (working)' ${ss_baseline} 2>&1) ; rc=$?
+[ ${rc} -ne 0] && exit_on_error "Rollback to BASELINE snapshot failed:\n${output}"
+surplus_snapshot=$(grep 'Creating read-only snapshot of current system.' <<< "${output}" | sed 's/[^0-9]//g')
+working_snapshot=$(grep 'Setting default subvolume to snapshot' <<< "${output}" | sed 's/[^0-9]//g') 
+log "Rollback done! The working BASELINE snapshot is ${working_snapshot}, recovery snapshot ${ss_active}. The surplus snapshot ${surplus_snapshot} gets deleted."
+snapper -c root delete ${surplus_snapshot}    # failure is not relevant
+
+# Bye.
+exit ${rc}

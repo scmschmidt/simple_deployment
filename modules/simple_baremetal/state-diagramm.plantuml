@@ -4,6 +4,12 @@ state rollback2baseline.baseline_rollback_done
 state rollback2baseline.baseline_rollback_failed
 state boot2baseline.boot2baseline_not_needed
 state boot2baseline.boot2baseline_initiated
+state rollback2recovery.recovery_rollback_planned
+state rollback2recovery.recovery_rollback_done
+state rollback2recovery.recovery_rollback_failed
+state boot2recovery.boot2recovery_not_needed
+state boot2recovery.boot2recovery_initiated
+state cleanup.cleanup_failed
 
 [*] --> baseline_rollback_planned
 baseline_rollback_planned --> baseline_rollback_done
@@ -11,6 +17,19 @@ baseline_rollback_planned --> baseline_rollback_failed
 
 baseline_rollback_done --> boot2baseline_initiated
 boot2baseline_initiated --> boot2baseline_not_needed
+
+boot2baseline_initiated --> recovery_rollback_planned
+boot2baseline_not_needed --> recovery_rollback_planned
+recovery_rollback_planned --> recovery_rollback_done
+recovery_rollback_planned --> recovery_rollback_failed
+
+recovery_rollback_done --> boot2recovery_initiated
+boot2recovery_initiated --> boot2recovery_not_needed
+
+boot2recovery_not_needed --> cleanup_failed
+boot2recovery_initiated --> cleanup_failed
+boot2recovery_not_needed --> [*]
+boot2recovery_initiated --> [*]
 
 @enduml
 

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+LANG=C
+
+# Include shared functions.
+. "${0%*${0##*/}}include"
+
+# Update snapshot variables including status.
+update_ss_vars
+
+# Cleanup must be done, if the status is set to `recovery_set`.
+[ "${status}" != 'recovery_set'  ] && exit_on_error 'Cleanup only if status is recovery_set'
+
+# Do cleanup only if we have been booted into the recovery snapshot.
+[ "${ss_active}" != "${ss_recovery}" ] && exit_on_error "No cleanup. Recovery snapshot (${ss_recovery}) is not the active (${ss_active}) one. "
+
+# Cleanup.
+snapper -c root delete "${ss_working_baseline}"
+> /var/lib/simple_baremetal/recovery_snapshot
+> /var/lib/simple_baremetal/working_snapshot
+> /var/lib/simple_baremetal/status
+log "Cleanup done."
+

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#   rebooter  - Reboots a machine and waits for its return (SSH login)
+#   wait4boot  - waits for a machine to come back from boot.
 #
 #   The script requires, that the user running it has a key-based login on the target machine.
 #   

@@ -1,0 +1,40 @@
+
+storage_dir='/var/lib/simple_baremetal'
+recovery_snapshot_file="${storage_dir}/recovery_snapshot"
+
+# Create storage directory and recovery file (if not already there).
+mkdir -p "${storage_dir}"
+touch "${recovery_snapshot_file}"
+
+function exit_on_error() {
+    log "${*}"
+    exit 1
+}
+
+function exit_on_success() {
+    log "${*}"
+    exit 0
+}
+
+function log() {
+    logger -t simple_baremetal "${*}"
+    echo -e "${*}"
+}
+
+function update_ss_vars() {
+    local output
+    output=$(LANG=C snapper --csvout -c root list --columns number,default,active,description)
+    ss_default=$(egrep '^[0-9]+,yes,'<<< "${output}" | cut -d, -f1)
+    ss_active=$(egrep '^[0-9]+.(yes|no),yes,'<<< "${output}" | cut -d, -f1)
+    ss_baseline=$(egrep '^[0-9]+,(yes|no),(yes|no),BASELINE$'<<< "${output}" | tail -n 1 | cut -d, -f1)
+    ss_baseline_working=$(egrep '^[0-9]+,(yes|no),(yes|no),BASELINE \(working\)$'<<< "${output}" | tail -n 1 | cut -d, -f1)
+
+    ss_status=$(< "${status_file}")
+    ss_recovery=$(< "${recovery_snapshot_file}")
+
+    [ -z "${ss_active}" ] && exit_on_error "Active snapshot not set! Exiting!"
+    [ -z "${ss_default}" ] && exit_on_error "Default snapshot not set! Exiting!"
+
+    log "default snapshot: ${ss_default}\nactive snapshot: ${ss_active}\nbaseline snapshot: ${ss_baseline}\nworking baseline snapshot: ${ss_baseline_working}\nrecovery snapshot: ${ss_recovery}\n"
+}
+ 

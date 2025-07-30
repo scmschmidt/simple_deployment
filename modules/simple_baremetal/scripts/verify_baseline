@@ -1,0 +1,16 @@
+#!/bin/bash
+
+LANG=C
+
+# Include shared functions.
+. /var/lib/simple_baremetal/scripts/include
+
+# Update snapshot variables.
+update_ss_vars
+
+# A successful boot into the working BASELINE happened if:
+#   - the working BASELINE snapshot is the active one
+[ "${ss_baseline_working}" != "${ss_active}" ] && exit_on_success "The working BASELINE snapshot is not the active one! Rollback failed."
+log "Rollback to BASELINE done!"
+
+

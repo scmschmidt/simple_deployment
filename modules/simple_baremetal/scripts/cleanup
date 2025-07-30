@@ -1,0 +1,19 @@
+#!/bin/bash
+
+LANG=C
+
+# Include shared functions.
+. /var/lib/simple_baremetal/scripts/include
+
+# Update snapshot variables.
+update_ss_vars
+
+# A successful boot into the recovery snapshot happened and a cleanup should be done if:
+#   - the recovery snapshot is the active one
+[ "${ss_active}" != "${ss_recovery}" ] && exit_on_error "Recovery snapshot is not the active one. Exiting."
+
+# Cleanup.
+snapper -c root delete "${ss_baseline_working}"
+> /var/lib/simple_baremetal/recovery_snapshot
+log "Cleanup done."
+
