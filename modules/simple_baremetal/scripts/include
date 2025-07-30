@@ -29,7 +29,6 @@ function update_ss_vars() {
     ss_baseline=$(egrep '^[0-9]+,(yes|no),(yes|no),BASELINE$'<<< "${output}" | tail -n 1 | cut -d, -f1)
     ss_baseline_working=$(egrep '^[0-9]+,(yes|no),(yes|no),BASELINE \(working\)$'<<< "${output}" | tail -n 1 | cut -d, -f1)
 
-    ss_status=$(< "${status_file}")
     ss_recovery=$(< "${recovery_snapshot_file}")
 
     [ -z "${ss_active}" ] && exit_on_error "Active snapshot not set! Exiting!"

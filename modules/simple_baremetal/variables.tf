@@ -9,15 +9,14 @@ variable "ssh_port" {
   default     = 22 
 }
 
-
 variable "admin_user" {
-  description = "The unpriviledged user to logon to the machine."
+  description = "The unprivileged user to logon to the machine."
   type        = string
   default     = "enter"
 }
 
 variable "admin_private_key" {
-  description = "The SSH private key for the admin unser to logon to the machine."
+  description = "The SSH private key for the admin user to logon to the machine."
   type        = string
   sensitive   = true
 }
@@ -28,13 +27,26 @@ variable "ssh_timeout" {
   default     = "10s"
 }
 
-variable "run_on_apply" {
-  description = "Path to a script copied to the host and executed there on apply."
-  type        = string
+variable "reboot_go_down_timeout" {
+  description = "Go down timeout for rebooter script in seconds."
+  type        = number
+  default     = 45
 }
 
-variable "run_on_destroy" {
-  description = "Path to a script copied to the host and executed there on destroy."
-  type        = string
+variable "reboot_come_up_timeout" {
+  description = "Come up timeout for rebooter script in seconds."
+  type        = number
+  default     = 120
 }
 
+variable "reboot_login_timeout" {
+  description = "Login timeout for rebooter script in seconds."
+  type        = number
+  default     = 40
+}
+
+variable "reboot_system_timeout" {
+  description = "System up timeout for rebooter script in seconds."
+  type        = number
+  default     = 30
+}
