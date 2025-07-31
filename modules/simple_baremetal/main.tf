@@ -1,9 +1,3 @@
-locals {
-  machine_ids       = toset(keys(var.machines))
-  machine_addresses = toset(values(var.machines))
-}  
-
-
 resource "null_resource" "machine" {
 
   for_each      = toset(keys(var.machines))
@@ -48,9 +42,9 @@ resource "null_resource" "machine" {
     inline  = ["bash /var/lib/simple_baremetal/scripts/rollback2baseline"]
   }
   provisioner "local-exec" {
-    command  = "${path.module}/rebooter ${var.admin_user}@${each.key}"
+    command  = "${path.module}/rebooter ${var.admin_user}@${var.machines[each.key]}"
     environment = {
-      SSH_OPTIONS     = ""
+      SSH_OPTIONS     = "-o StrictHostKeyChecking=no"
       GO_DOWN_TIMEOUT = var.reboot_go_down_timeout
       COME_UP_TIMEOUT = var.reboot_come_up_timeout
       LOGIN_TIMEOUT   = var.reboot_login_timeout
@@ -68,7 +62,7 @@ resource "null_resource" "machine" {
   }
   provisioner "local-exec" {
     when    = destroy
-    command  = "${path.module}/rebooter ${self.triggers.admin_user}@${each.key}"
+    command  = "${path.module}/rebooter ${self.triggers.admin_user}@${self.triggers.address}"
     environment = {
       SSH_OPTIONS     =  ""
       GO_DOWN_TIMEOUT = "${self.triggers.reboot_go_down_timeout}"

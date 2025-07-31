@@ -142,7 +142,7 @@ How to set this up, is beyond this guide.
 
 ### Setup bare-metal
 
-sdsd
+The systems must be installed and reachable via SSH whith key-based authentication. No interaction must be necessary on logon. A snapshot `BASELINE` must be present. See [simple_baremetal](modules/simple_baremetal/README.md) for details.
 
 ## Usage
 
@@ -157,7 +157,7 @@ You can find detailed descriptions about how to use the modules here:
 Anyways, you need at least a minor understanding of terraform.
 
 ```
-# Our test landscapes with two machines per SLES for SAP 15 release on AWS (A), Azure (B) and libvirt (C).
+# Our test landscapes with some machines with SLES for SAP applications 15 releases on AWS (A), Azure (B) and libvirt (C).
 
 module "test_landscape_A" {
   source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_aws"
@@ -283,7 +283,10 @@ test_machines_C = [
 
 - A shutdowned machine would normally get redeployed, because the IP address is not present anymore. 
   We ignoring changes to the IP address, therefore shutdowned machines get ignored an represented with an empty IP address. If they have been restarted, an additional `terraform apply` or `terraform refresh` is necessary to update the state. Keep in mind, that the newly started machine will get a new IP address!
-  
+
+### simple_baremetal
+
+- This is an exotic foreigner amongst the others. It does not deploys anything, but expects already installed and configured systems. It only switches between btrfs snapshots.
 
 ## Changelog
 

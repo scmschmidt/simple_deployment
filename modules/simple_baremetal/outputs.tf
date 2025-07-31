@@ -4,3 +4,10 @@ output "machines" {
   sensitive   = false
 }
 
+output "machine_info" {
+  value       = {
+    for id, data in null_resource.machine:
+      "${id}" => data.triggers.address
+    }
+  description = "Some data of bare-metal machines."
+}

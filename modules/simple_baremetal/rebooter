@@ -13,6 +13,8 @@
 
 set -u 
 
+step=500  # print timeouts just every "step" second
+
 # One parameter: the target host (with optional user)
 if [ $# -ne 1 ] ; then
     echo "Usage: ${0##*/} [USER@]HOST" >&2
@@ -45,7 +47,7 @@ echo -n "Waiting for ${target#*@} becoming unreachable... "
 c=${GO_DOWN_TIMEOUT}
 cmd="timeout 3 ssh ${SSH_OPTIONS} -o ConnectTimeout=3 ${target} :" 
 while eval ${cmd} > /dev/null 2>&1 ; do
-    echo -n "${c} "
+    [ "$(( ${c} % ${step} ))" -eq 0 ] && echo -n "${c} "
     sleep 1
     (( c-- ))
     if [ ${c} -eq 0 ] ; then
@@ -60,7 +62,7 @@ echo -n "Waiting for ${target#*@} becoming reachable... "
 c=${COME_UP_TIMEOUT}
 cmd="ssh ${SSH_OPTIONS} -o ConnectTimeout=4 ${target} :"
 while ! eval ${cmd} > /dev/null 2>&1  ; do
-    echo -n "${c} "
+    [ "$(( ${c} % ${step} ))" -eq 0 ] && echo -n "${c} "
     sleep 1
     (( c-- ))
         if [ ${c} -eq 0 ] ; then
@@ -77,7 +79,7 @@ cmd="ssh ${SSH_OPTIONS} ${target} 'systemctl is-system-running'"
 while : ; do
     state=$(eval ${cmd})
     [ "${state}" == "running" -o "${state}" == "degraded" ] && break
-    echo -n "${c} "
+    [ "$(( ${c} % ${step} ))" -eq 0 ] && echo -n "${c} "
     sleep 1
     (( c-- ))
         if [ ${c} -eq 0 ] ; then
