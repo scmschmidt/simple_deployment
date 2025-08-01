@@ -74,10 +74,11 @@ module "simple_baremetal" {
   reboot_system_timeout = 30
 }
 
+# Name and IP address of the bare-metal machines.
 output "test_machines_C" {
   value       = {
     for id, data in module.test_landscape_C.machines:
-      "${id}" => data.triggers.address
+      "${id}" => data
     }
   description = "Some data of bare-metal machines."
 }
