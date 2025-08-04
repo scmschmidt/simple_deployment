@@ -33,7 +33,7 @@ resource "null_resource" "machine" {
 
   # Copy scripts to remote machine.
   provisioner "file" {
-    source      = "${path.module}/scripts"
+    source      = "${path.module}/scripts/"
     destination = "/var/lib/simple_baremetal"
   }
 
