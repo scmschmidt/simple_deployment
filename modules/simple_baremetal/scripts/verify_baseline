@@ -3,7 +3,7 @@
 LANG=C
 
 # Include shared functions.
-. /var/lib/simple_baremetal/scripts/include
+. /var/lib/simple_baremetal/include
 
 # Update snapshot variables.
 update_ss_vars

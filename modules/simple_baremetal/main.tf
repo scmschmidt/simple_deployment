@@ -12,9 +12,9 @@ resource "null_resource" "machine" {
     reboot_come_up_timeout = var.reboot_come_up_timeout
     reboot_login_timeout   = var.reboot_login_timeout
     reboot_system_timeout  = var.reboot_system_timeout
-    timestamp              = timestamp()
     hostname               = "${each.key}"
     address                = var.machines[each.key]
+    timestamp              = timestamp()
   }
 
   connection {
@@ -24,6 +24,7 @@ resource "null_resource" "machine" {
     private_key    = "${self.triggers.admin_private_key}"
     host           = "${self.triggers.address}"
     timeout        = "${self.triggers.ssh_timeout}"
+    agent          = "false"
 
     # bastion_host	Setting this enables the bastion Host connection. The provisioner will connect to bastion_host first, and then connect from there to host.	
     # bastion_port	The port to use connect to the bastion host.	The value of the port field.
@@ -33,13 +34,14 @@ resource "null_resource" "machine" {
 
   # Copy scripts to remote machine.
   provisioner "file" {
-    source      = "${path.module}/scripts/"
+    source      = "${path.module}/scripts"
     destination = "/var/lib/simple_baremetal"
   }
 
+
   # Execution on apply (in the order of appearance!).
   provisioner "remote-exec" {
-    inline  = ["bash /var/lib/simple_baremetal/scripts/rollback2baseline"]
+    inline  = ["bash /var/lib/simple_baremetal/rollback2baseline"]
   }
   provisioner "local-exec" {
     command  = "${path.module}/rebooter ${var.admin_user}@${var.machines[each.key]}"
@@ -52,13 +54,13 @@ resource "null_resource" "machine" {
     }
   }
   provisioner "remote-exec" {
-    inline  = ["bash /var/lib/simple_baremetal/scripts/verify_baseline"]
+    inline  = ["bash /var/lib/simple_baremetal/verify_baseline"]
   }
 
   # Execution on destroy.
   provisioner "remote-exec" {
     when    = destroy
-    inline  = ["bash /var/lib/simple_baremetal/scripts/rollback2recovery"]
+    inline  = ["bash /var/lib/simple_baremetalrollback2recovery"]
   }
   provisioner "local-exec" {
     when    = destroy
@@ -73,7 +75,7 @@ resource "null_resource" "machine" {
   }
   provisioner "remote-exec" {
     when    = destroy
-    inline  = ["bash /var/lib/simple_baremetal/scripts/cleanup"]
+    inline  = ["bash /var/lib/simple_baremetal/cleanup"]
   }
 
 }
