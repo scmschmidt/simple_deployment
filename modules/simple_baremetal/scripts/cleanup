@@ -14,6 +14,7 @@ update_ss_vars
 
 # Cleanup.
 snapper -c root delete "${ss_baseline_working}"
-> /var/lib/simple_baremetal/recovery_snapshot
+> "${recovery_snapshot_file}"
+> "${status_file}"
 log "Cleanup done."
 

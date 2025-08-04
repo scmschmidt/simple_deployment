@@ -12,5 +12,5 @@ update_ss_vars
 #   - the working BASELINE snapshot is the active one
 [ "${ss_baseline_working}" != "${ss_active}" ] && exit_on_success "The working BASELINE snapshot is not the active one! Rollback failed."
 log "Rollback to BASELINE done!"
-
+echo BASELINE > "${status_file}"
 

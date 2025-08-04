@@ -9,9 +9,11 @@ LANG=C
 update_ss_vars
 
 # We rollback to the BASELINE snapshot only if:
+#   - the status says, that we are already finished a rollback
 #   - a BASELINE snapshot exists
 #   - no working BASELINE snapshot exists
 #   - the working BASELINE snapshot is not the active snapshot
+[ "${ss_status}" == BASELINE ] && exit_on_success "Status says, rollback to BASELINE already done. Exiting."
 [ -z "${ss_baseline}" ] && exit_on_error "No BASELINE snapshot found! Exiting."   
 [ -n "${ss_baseline_working}" ] && exit_on_success "A working BASELINE snapshot already exists! Exiting."
 [ "${ss_baseline_working}" == "${ss_active}" ] && exit_on_success "The working BASELINE snapshot is already the active one! Exiting."
