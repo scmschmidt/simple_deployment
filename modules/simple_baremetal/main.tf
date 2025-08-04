@@ -60,7 +60,7 @@ resource "null_resource" "machine" {
   # Execution on destroy.
   provisioner "remote-exec" {
     when    = destroy
-    inline  = ["bash /var/lib/simple_baremetalrollback2recovery"]
+    inline  = ["bash /var/lib/simple_baremetal/rollback2recovery"]
   }
   provisioner "local-exec" {
     when    = destroy
