@@ -14,7 +14,6 @@ resource "null_resource" "machine" {
     reboot_system_timeout  = var.reboot_system_timeout
     hostname               = "${each.key}"
     address                = var.machines[each.key]
-    timestamp              = timestamp()
   }
 
   connection {
@@ -35,7 +34,7 @@ resource "null_resource" "machine" {
   # Copy scripts to remote machine.
   provisioner "file" {
     source      = "${path.module}/scripts"
-    destination = "/var/lib/simple_baremetal"
+    destination = "/var/lib/simple_baremetal/"
   }
 
 

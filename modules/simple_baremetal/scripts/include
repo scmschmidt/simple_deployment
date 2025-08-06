@@ -36,6 +36,6 @@ function update_ss_vars() {
     [ -z "${ss_active}" ] && exit_on_error "Active snapshot not set! Exiting!"
     [ -z "${ss_default}" ] && exit_on_error "Default snapshot not set! Exiting!"
 
-    log "default snapshot: ${ss_default}\nactive snapshot: ${ss_active}\nbaseline snapshot: ${ss_baseline}\nworking baseline snapshot: ${ss_baseline_working}\nrecovery snapshot: ${ss_recovery}\nstatus: ${ss_status}"
+    log "caller: ${0}\ndefault snapshot: ${ss_default}\nactive snapshot: ${ss_active}\nbaseline snapshot: ${ss_baseline}\nworking baseline snapshot: ${ss_baseline_working}\nrecovery snapshot: ${ss_recovery}\nstatus: ${ss_status}"
 }
  

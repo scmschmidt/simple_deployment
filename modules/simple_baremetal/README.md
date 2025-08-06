@@ -25,6 +25,10 @@ On apply a read-write copy of that snapshot is created and booted into.
 
 ## Cleanup
 
+> :exclamation: In case destroy fails with "Something went wrong. No subvolume found for snapshot ...", it could be, that the snapshot was deleted by a `snapper` cleanup meanwhile.
+Chose another snapshot (see step 1 below) and write the new number into `/var/lib/simple_baremetal/recovery_snapshot`. A `terraform destroy` should work now.
+
+
 If something goes wrong and a destroy does not cleans up correctly:
 
 1. Determine the snapshot to what you want to return to.\
@@ -41,6 +45,7 @@ If something goes wrong and a destroy does not cleans up correctly:
 
 4. Remove surplus snapshots.\
    Run a `snapper -c root list` and delete all snapshots with the description `BASELINE (working)` with `snapper -c root delete <SNAPSHOT NUMBER>`.
+
 
 
 ## Example Usage

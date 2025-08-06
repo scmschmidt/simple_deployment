@@ -23,7 +23,7 @@ echo "${ss_active}" > "${recovery_snapshot_file}"
 
 # Rollback to BASELINE snapshot.
 output=$(LANG=C snapper -c root rollback -d 'BASELINE (working)' ${ss_baseline} 2>&1) ; rc=$?
-[ ${rc} -ne 0] && exit_on_error "Rollback to BASELINE snapshot failed:\n${output}"
+[ ${rc} -ne 0 ] && exit_on_error "Rollback to BASELINE snapshot failed:\n${output}"
 surplus_snapshot=$(grep 'Creating read-only snapshot of current system.' <<< "${output}" | sed 's/[^0-9]//g')
 working_snapshot=$(grep 'Setting default subvolume to snapshot' <<< "${output}" | sed 's/[^0-9]//g') 
 log "Rollback done! The working BASELINE snapshot is ${working_snapshot}, recovery snapshot ${ss_active}. The surplus snapshot ${surplus_snapshot} gets deleted."
