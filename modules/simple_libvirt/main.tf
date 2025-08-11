@@ -19,10 +19,8 @@ locals {
 
 terraform {
   required_providers {
-    # Pinned dmacvicar/libvirt to version 0.6.10 because later version have a bug which can prevent SSH-based libvirt connections: https://github.com/dmacvicar/terraform-provider-libvirt/issues/864
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "= 0.6.10"
     }
   }
   required_version = ">= 1.1.0"
@@ -88,7 +86,7 @@ resource "libvirt_domain" "domain" {
     #volume_id = element(libvirt_volume.volume.*.id, count.index)
     volume_id = libvirt_volume.volume[each.key].id
   }
-  cpu = {
+  cpu {
     mode = "host-passthrough"
   }
 }
