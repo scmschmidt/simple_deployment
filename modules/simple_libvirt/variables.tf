@@ -10,6 +10,18 @@ variable "subnet" {
   default     = "172.31.0.0/16"
 }
 
+variable "network_bridge" {
+  description = "The bridge devices (of an existing network) added to the virtual machines. Disables network creation (subnet)."
+  type        = string
+  default     = ""
+}
+
+variable "use_qemu-guest-agent" {
+  description = "Enables the use of the `qemu-guest-agent`, which is required to retrieve an IP address in session mode."
+  type        = bool
+  default     = false
+}
+
 variable "name" {
   description = "Name for the environment and used as identifier for hostname, image names, etc."
   type        = string

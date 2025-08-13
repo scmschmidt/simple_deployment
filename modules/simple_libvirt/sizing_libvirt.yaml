@@ -26,3 +26,7 @@ large:
   vcpu:     4
   memory:   4096
   disksize: 2000
+x-large:
+  vcpu:     8
+  memory:   8192
+  disksize: 2000

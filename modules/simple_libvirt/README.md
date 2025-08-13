@@ -139,3 +139,64 @@ The module outputs the following variables:
   * `size` - The sizing identifier used in the plan.
   * `image` - The image identifier used in the plan.
   * `ip_address` - The (first) IP (of the first interface) for the machine.
+
+
+## Usage with `qemu:///session`
+
+Using `qemu:///session` comes with a few caveats, but is possible.
+
+The dmacvicar/libvirt terraform provider does not honor `qemu:///session` as URI ('location` parameter in this module): https://github.com/dmacvicar/terraform-provider-libvirt/issues/906.
+
+The workaround is to use `location = "qemu:///?name=qemu:///session&socket=/run/user/<UID>>/libvirt/virtqemud-sock"` with the `UID` of the user executing `terraform`. 
+
+#TODO: (HOW TO DO CREATE THE SOCKET PERMANENTLY?) The socket will be created first if a `virsh connect qemu:///session` has been executed first.
+
+Connecting as user session instead of a system session has some implications:
+  - Networks cannot be created (missing permission to create network devices).
+  - Existing networks created via `qemu:///system` are not available.
+  
+But it is possible to add interfaces (e.g bridges) of existing networks (created via `qemu:///system`) to a domain/machine.
+
+What do do?
+
+On the KVM host:
+
+  - Create a network (dhcp4 is required) in system mode and remember the used bridge device.
+  - Install the `qemu-bridge-helper` (e.g. part of  the `qemu-tools` package on SUSE).
+  - Make sure the SetUID is set on `qemu-bridge-helper` and it is owned by root (default on SUSE).
+  - Make sure you can execute the `qemu-bridge-helper` binary.
+    #TODO: WHY DOES KVM GROUP MEMBERSHIP DID NOT WORK?)
+  - Add an allow rule for the bridge(s) (`allow virbrN`) or a rule to allow all (`allow all`) to `/etc/qemu/bridge.conf`.
+
+This allows to add the network bridge of the created network to be added to the machine as user.
+
+The qcow2 image which is used for the virtual machine must have:
+
+  - the `qemu-guest-agent` be present (`qemu-guest-agent` package on SUSE),
+  - the `qemu-guest-agent.service` be enabled to be started at boot (default on SUSE)
+
+This will allow the provider to use the guest agent (`qemu_agent = true`) to retrieve IP addresses (`wait_for_lease = true`).
+
+To switch to user session mode, you have to set a few variables in `main.tf`:
+
+  - `location = "qemu:///?name=qemu:///session&socket=/run/user/<UID>/libvirt/virtqemud-sock"`\
+    Replace `<UID>` with your own.
+  - `network_bridge = "<BRIDGE>"`\
+    Replace `<BRIDGE>` with the bridge used by the network you want to use. Setting this variable (default is empty) disables the network creation (The `subnet` variable has no meaning).
+  - `use_qemu-guest-agent = true`\
+    Enables the use of the `qemu-guest-agent`, which is required to retrieve an IP address in session mode.
+
+
+Here a list of SLES qcow2 images and their working status:
+
+  - SLES 12 SP5: SLES12-SP5-JeOS.x86_64-12.5-OpenStack-Cloud-GM.qcow2 -> no (times out -> no qemu-guest-agent)
+  - SLES 15 SP3: SLES15-SP3-JeOS.x86_64-15.3-OpenStack-Cloud-QU4.qcow2 -> not reliably (seldom IPv6 only)
+  - SLES 15 SP4: SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-QU4.qcow2 -> yes
+  - SLES 15 SP5: SLES15-SP5-Minimal-VM.x86_64-Cloud-QU4.qcow2 -> yes
+  - SLES 15 SP6: SLES15-SP6-Minimal-VM.x86_64-Cloud-QU4.qcow2 -> yes
+  - SLES 15 SP7: SLES15-SP7-Minimal-VM.x86_64-Cloud-GM.qcow2 -> yes
+  - SLES 16.0 (PublicRC): SLES-16.0-Minimal-VM.x86_64-Cloud-PublicRC.qcow2 -> yes
+  - SLES-SAP 16.0 (PublicRC): SLES-SAP-16.0-Minimal-VM-x86_64-Cloud-PublicRC.qcow2  -> yes
+
+
+#TODO: SLES4SAP IMAGES DO NOT WORK!!!!

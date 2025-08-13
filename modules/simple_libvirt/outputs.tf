@@ -12,6 +12,7 @@ output "machine_info" {
         "size"       = var.machines[id][0]
         "image"      = var.machines[id][1]
         "ip_address" = try(data.network_interface[0].addresses[0], "")
+        "interfaces" = try(data.network_interface[*].addresses[*], "")
       }
     }
   description = "Some aggregated data about deployed machines."

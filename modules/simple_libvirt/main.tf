@@ -21,6 +21,12 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
+      
+      # Getting IPv4 addresses via DHCP does not work reliable with newer versions
+      # (0.8.3 still did not) in session mode: https://github.com/dmacvicar/terraform-provider-libvirt/issues/1091
+      # Therefore to allow qemu user sessions - which requires the qemu-guest-agent -
+      # a version lock is required (and only for that specific scenario).
+      version = "0.7.1"
     }
   }
   required_version = ">= 1.1.0"
@@ -71,17 +77,47 @@ resource "libvirt_cloudinit_disk" "cloudinit_disk" {
   network_config = templatefile("${path.module}/cloudinit.network.tftpl", {})
 }
 
-# Create the machine.
+# Create the machines.
 resource "libvirt_domain" "domain" {
+  
   for_each  = local.machine_ids
   name      = "${var.name}-${each.key}"
   memory    = lookup(local.sizing_map[var.machines[each.key][0]], "memory")
   vcpu      = lookup(local.sizing_map[var.machines[each.key][0]], "vcpu")
   cloudinit = libvirt_cloudinit_disk.cloudinit_disk.id
-  network_interface {
-    network_name   = var.name
-    wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
+  qemu_agent = true
+
+  
+  # network_interface {
+  #   network_name   = var.name
+  #   wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
+  # }
+
+  # network_interface {
+  #   bridge = var.network_bridge 
+  #   wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
+  # }
+
+  # Interface in new network (if bridge was not set).
+  dynamic "network_interface" {
+    for_each = var.network_bridge == "" ? [1] : []
+
+    content {
+      network_name   = var.name
+      wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
+    }
   }
+
+  # Network bridge (if bridge was set).
+  dynamic "network_interface" {
+    for_each = var.network_bridge != "" ? [1] : []
+
+    content {
+      bridge = var.network_bridge 
+      wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
+    }
+  }
+
   disk {
     #volume_id = element(libvirt_volume.volume.*.id, count.index)
     volume_id = libvirt_volume.volume[each.key].id
@@ -89,4 +125,5 @@ resource "libvirt_domain" "domain" {
   cpu {
     mode = "host-passthrough"
   }
+
 }
