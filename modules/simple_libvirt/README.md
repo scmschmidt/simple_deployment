@@ -203,3 +203,4 @@ Here a list of SLES qcow2 images and their working status:
 | SLES 16.0 (PublicRC) | SLES-16.0-Minimal-VM.x86_64-Cloud-PublicRC.qcow2 | yes |
 | SLES-SAP 16.0 (PublicRC) | SLES-SAP-16.0-Minimal-VM-x86_64-Cloud-PublicRC.qcow2 | yes |
 
+> :wrench: If the output contains no or just a few IPv4 addresses, A few `terraform refresh` might help. If the `qemu-guest-agent` is present, the DHCP addresses turn up eventually.
