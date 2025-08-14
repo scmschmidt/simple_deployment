@@ -155,7 +155,7 @@ The `dmacvicar/libvirt` terraform provider does not honor `qemu:///session` as U
 
 The workaround is to use `location = "qemu:///?name=qemu:///session&socket=/run/user/<UID>>/libvirt/virtqemud-sock"` with the `UID` of the user executing `terraform`.
 The socket is created when executing `virsh connect qemu:///session` by the started `/usr/sbin/virtqemud`.
-The `virtqemud` has normally a timeout (default 120s), so the socket is not permanent and will vanish if not used. There seems no way to change the default timeout. Best call `virsh connect qemu:///session` before you run `terraform apply` to make sure the socket is present.
+The `virtqemud` has normally a timeout (default 120s), so the socket is not permanent and will vanish if not used. There seems no way to change the default timeout. Best call `virsh connect qemu:///session` before you run `terraform apply` to make sure the socket is present or enter `virsh` with `VIRSH_DEFAULT_CONNECT_URI='qemu:///session' virsh` to keep the socket open.
 
 Connecting via a user session instead of a system session has some implications:
   - Networks cannot be created (missing permission to create network devices).
