@@ -32,13 +32,16 @@ terraform {
   required_version = ">= 1.1.0"
 }
 
-# Configure the Libvirt provider.
+# Configure the libvirt provider.
 provider "libvirt" {
   uri = local.libvirt_uri
 }
 
-# We create our own network for all machines with dhcp and NAT. 
+# We create our own network for all machines with dhcp and NAT (if no bridge is defined). 
 resource "libvirt_network" "network" {
+
+  count     = var.network_bridge != "" ? 0 : 1
+
   name      = var.name
   mode      = "nat"
   autostart = true
@@ -85,18 +88,7 @@ resource "libvirt_domain" "domain" {
   memory    = lookup(local.sizing_map[var.machines[each.key][0]], "memory")
   vcpu      = lookup(local.sizing_map[var.machines[each.key][0]], "vcpu")
   cloudinit = libvirt_cloudinit_disk.cloudinit_disk.id
-  qemu_agent = true
-
-  
-  # network_interface {
-  #   network_name   = var.name
-  #   wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
-  # }
-
-  # network_interface {
-  #   bridge = var.network_bridge 
-  #   wait_for_lease = true # This makes sure, an apply returns if the IP address has been set!
-  # }
+  qemu_agent = var.network_bridge != "" ? true : false
 
   # Interface in new network (if bridge was not set).
   dynamic "network_interface" {
@@ -125,5 +117,9 @@ resource "libvirt_domain" "domain" {
   cpu {
     mode = "host-passthrough"
   }
+
+  # Ensures a link between disk and domain, so if domain creation
+  # fails, a follow-up destroy removes the disk as well.
+  depends_on = [libvirt_cloudinit_disk.cloudinit_disk]
 
 }

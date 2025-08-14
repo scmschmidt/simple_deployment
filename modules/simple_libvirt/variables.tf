@@ -11,15 +11,9 @@ variable "subnet" {
 }
 
 variable "network_bridge" {
-  description = "The bridge devices (of an existing network) added to the virtual machines. Disables network creation (subnet)."
+  description = "The bridge devices (of an existing network) added to the virtual machines. Disables network creation ('subnet') and enables use of 'qemu-guest-agent'."
   type        = string
   default     = ""
-}
-
-variable "use_qemu-guest-agent" {
-  description = "Enables the use of the `qemu-guest-agent`, which is required to retrieve an IP address in session mode."
-  type        = bool
-  default     = false
 }
 
 variable "name" {
@@ -28,7 +22,7 @@ variable "name" {
 }
 
 variable "machines" {
-  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tupel of size identifier and image identifier as value."
+  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tuple of size identifier and image identifier as value."
   type        = map(list(string))
 }
 
