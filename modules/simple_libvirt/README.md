@@ -194,7 +194,7 @@ Here a list of SLES qcow2 images and their working status:
 
 | Release  | Image | works? |
 | ---      | ---   | ---    |
-| SLES 12 SP5 | SLES12-SP5-JeOS.x86_64-12.5-OpenStack-Cloud-GM.qcow2 | no (times out -> no `qemu-guest-agent`) |
+| SLES 12 SP5 | SLES12-SP5-JeOS.x86_64-12.5-OpenStack-Cloud-GM.qcow2 | no (times out -> present `qemu-ga` seems not to work) |
 | SLES 15 SP3 | SLES15-SP3-JeOS.x86_64-15.3-OpenStack-Cloud-QU4.qcow2 | not reliably (seldom IPv6 only) |
 | SLES 15 SP4 | SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-QU4.qcow2 | yes |
 | SLES 15 SP5 | SLES15-SP5-Minimal-VM.x86_64-Cloud-QU4.qcow2 | yes |
