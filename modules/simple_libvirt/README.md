@@ -153,7 +153,7 @@ Using `qemu:///session` comes with a few caveats, but is possible.
 
 The `dmacvicar/libvirt` terraform provider does not honor `qemu:///session` as URI (`location` parameter in this module): https://github.com/dmacvicar/terraform-provider-libvirt/issues/906.
 
-The workaround is to use `location = "qemu:///?name=qemu:///session&socket=/run/user/<UID>>/libvirt/virtqemud-sock"` with the `UID` of the user executing `terraform`.
+The workaround is to use `location = "qemu:///?name=qemu:///session&socket=/run/user/<UID>>/libvirt/virtqemud-sock"` with the `UID` of the user executing `terraform` or `location = "qemu:///?name=qemu:///session&socket=/home/saptune-testing/.cache/libvirt/virtqemud-sock"` depending on your libvirt version.
 The socket is created when executing `virsh connect qemu:///session` by the started `/usr/sbin/virtqemud`.
 The `virtqemud` has normally a timeout (default 120s), so the socket is not permanent and will vanish if not used. There seems no way to change the default timeout. Best call `virsh connect qemu:///session` before you run `terraform apply` to make sure the socket is present or enter `virsh` with `VIRSH_DEFAULT_CONNECT_URI='qemu:///session' virsh` to keep the socket open.
 
@@ -170,7 +170,7 @@ On the KVM host:
   - Create a network (dhcp4 is required) in system mode and remember the used bridge device.
   - Install the `qemu-bridge-helper` (part of  the `qemu-tools` package on SUSE).
   - Make sure the SetUID is set on `qemu-bridge-helper` and it is owned by root (default on SUSE).
-  - Make sure you can execute the `qemu-bridge-helper` binary. If you adon't have the permissions, add an ACL to give you or a dedicated group you are a member of the execution and read permission (e.g. `setfacl -m g:virtuser:rx /usr/lib/qemu-bridge-helper`).
+  - Make sure you can execute the `qemu-bridge-helper` binary. If you don't have the permissions, add an ACL to give you or a dedicated group you are a member of the execution and read permission (e.g. `setfacl -m g:virtuser:rx /usr/lib/qemu-bridge-helper`).
   - Add an allow rule for the bridge(s) (`allow virbrN`) or a rule to allow all (`allow all`) to `/etc/qemu/bridge.conf`.
 
 With these steps adding the network bridge of the created network to the machine as user should work.
