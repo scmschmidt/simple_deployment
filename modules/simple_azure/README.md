@@ -221,4 +221,15 @@ The module outputs the following variables:
   * `id` - The instance id.
   * `size` - The sizing identifier used in the plan.
   * `image` - The image identifier used in the plan.
-  * `ip_address` - The public IP for the instance.
+  * `ip_address` - The IP of the instance (public or private depending on existence of bastion host).
+
+* `bastion_info` (object)
+
+  Aggregated information of the optional bastion instance.
+  The value is an object with:
+
+  * `id` - The instance id.
+  * `size` - The sizing identifier used in the plan.
+  * `image` - The image identifier used in the plan.
+  * `public_ip_address` - The public IP of the instance.
+  * `private_ip_address` - The private IP of the instance.
