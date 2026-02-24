@@ -1,0 +1,52 @@
+#!/bin/bash
+
+exec > /var/log/simple_deployment-startup.log 2>&1
+
+# Step 1 - Creating logon user and allow root logons (all key-based)
+#
+# We create an unprivileged user 'enter' who can authenticates with an RSA key. As member of the wheel
+# group he can do a password-less sudo (requires sudoers drop-in made by the provisioning script).
+# Also we provide a SSH key for the root login. If you don't need that, you can leave root alone.
+
+useradd -m -G wheel ${admin_username}
+passwd -l SUSEConnect --clean
+mkdir "/home/${admin_username}/.ssh/"
+echo "${admin_user_key}" > "/home/${admin_username}/.ssh/authorized_keys"
+chmod 700 "/home/${admin_username}/.ssh/"
+chmod 600 "/home/${admin_username}/.ssh/authorized_keys"
+chown -R ${admin_username}: "/home/${admin_username}/.ssh/"
+
+passwd -l root
+mkdir /root/.ssh/
+echo "${admin_user_key}" >> /root/.ssh/authorized_keys
+chmod 700 /root/.ssh/
+chmod 600 /root/.ssh/authorized_keys
+
+
+# Step 2 - Preparation of sudoers and registration on SCC 
+#
+# If you want to to an update or install software, do it after the registration here 
+# in this script. The cloud-init package module will not work, if the deployed image 
+# has no repositories defined (BYOS!)
+
+# Disable root SSH login if wanted (in a cheap way).
+[ "${enable_root_login}" -eq 0 ] && ( echo 'PermitRootLogin no' >> /etc/ssh/sshd_config ; systemctl restart sshd.service )
+
+# Allowing users of the wheel group to do a passwordless sudo.
+# ('sudo: yes' in the user section did not work)
+echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/00_wheel_nopasswd
+
+# Load German keymap if necessary.
+# (This is only necessary for logins in the OpenStack SLES cloud images.
+# Also, for unknown reasons, the cloud-init keyboard module didn't work.)
+[[ $(localectl --no-pager status | grep Keymap) =~ ${keymap} ]] || /usr/bin/localectl set-keymap "${keymap}"
+
+# Register the SLES.
+SUSEConnect --clean
+if [ "${registration_server}" != '-' ] ; then
+  if [ "${subscription_registration_key}" == '-' ] ; then 
+    SUSEConnect  --url "${registration_server}"
+  else
+    SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
+  fi
+fi
