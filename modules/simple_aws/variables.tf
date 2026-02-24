@@ -4,7 +4,7 @@ variable "location" {
 }
 
 variable "subnet" {
-  description = "Subnet for VPC and used for the IP addresses for the virtual machines."
+  description = "Subnet for VPC and used for the IP addresses for the virtual machines. If bastion host is used, the subnet will be divided into two halves (for private and public subnets)."
   type        = string
   default     = "172.31.0.0/16"
 }

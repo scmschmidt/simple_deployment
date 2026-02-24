@@ -9,6 +9,9 @@ locals {
   # otherwise we use the new 'admin_user_keys' directly
   subscription_registration_keys = var.subscription_registration_key != "-" ? [var.subscription_registration_key] : var.subscription_registration_keys
 
+  # Divide subnet into a private part (for machines) and a public part for the NAT gateway.
+  subnets = cidrsubnets(var.subnet, 1, 1)
+
   # New machine definition format has four entries (size, image, ssh key slot, reg key slot),
   # but the old two entry-format (size, image) needs to be supported, so as default the 
   # first slots (0, 0) are always used.
@@ -65,13 +68,13 @@ data "aws_availability_zones" "available" {
 # Create VPC.
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  name = "${var.name}-vpc"
-  cidr = var.subnet
-  azs             = data.aws_availability_zones.available.names
-  private_subnets = []
-  public_subnets  = [var.subnet]
-  enable_nat_gateway = false
-  single_nat_gateway = true
+  name                = "${var.name}-vpc"
+  cidr                = var.subnet
+  azs                 = data.aws_availability_zones.available.names
+  private_subnets     = length(var.bastion) == 0 ? [] : [local.subnets[1]]
+  public_subnets      = length(var.bastion) == 0 ? [var.subnet] : [local.subnets[0]]
+  enable_nat_gateway  = length(var.bastion) == 0 ? false : true
+  single_nat_gateway  = true
   tags = {
     Name = "${var.name}-vpc"
   }
@@ -110,26 +113,51 @@ resource "aws_security_group" "security_group" {
   }
 }
 
-# Create the instance.
-resource "aws_instance" "instance" {
-  for_each      = local.machine_ids
-  ami           = local.image_map[local.machine_definitions[each.key][1]]
-  instance_type = local.sizing_map[local.machine_definitions[each.key][0]]
+# Create the the virtual machines.
+resource "aws_instance" "virtual_machine" {
+  for_each                    = local.machine_ids
+  ami                         = local.image_map[local.machine_definitions[each.key][1]]
+  instance_type               = local.sizing_map[local.machine_definitions[each.key][0]]
   vpc_security_group_ids      = [aws_security_group.security_group.id]
-  associate_public_ip_address = true
-  subnet_id                   = module.vpc.public_subnets[0]
+  associate_public_ip_address = length(var.bastion) == 0 ? true : false
+  subnet_id                   = length(var.bastion) == 0 ? module.vpc.public_subnets[0] : module.vpc.private_subnets[0]
   user_data_base64            = base64encode(templatefile(local.cloudinit_template, { 
-    keymap = var.keymap,
-    admin_username = var.admin_user, 
-    admin_user_key = local.machine_definitions[each.key][2], 
+    keymap                        = var.keymap,
+    admin_username                = var.admin_user, 
+    admin_user_key                = local.machine_definitions[each.key][2], 
     subscription_registration_key = local.machine_definitions[each.key][3],
-    registration_server = var.registration_server,
-    enable_root_login = var.enable_root_login ? 1 : 0
+    registration_server           = var.registration_server,
+    enable_root_login             = var.enable_root_login ? 1 : 0
   }))
   tags = {
     Name = "${var.name}-${each.key}"
   }
 
+  # Shutdowned machines shall not lead to a redeployment on apply.
+  lifecycle {
+    ignore_changes = [associate_public_ip_address]
+  }
+}
+
+# Create the bastion host.
+resource "aws_instance" "bastion_virtual_machine" {
+  count                       = length(var.bastion) == 0 ? 0 : 1
+  ami                         = local.image_map[var.bastion[1]]
+  instance_type               = local.sizing_map[var.bastion[0]]
+  vpc_security_group_ids      = [aws_security_group.security_group.id]
+  associate_public_ip_address = true
+  subnet_id                   = module.vpc.public_subnets[0]
+  user_data_base64            = base64encode(templatefile(local.cloudinit_template, { 
+    keymap                        = var.keymap,
+    admin_username                = var.admin_user,
+    admin_user_key                = local.bastion_definition[2],
+    subscription_registration_key = local.bastion_definition[3],
+    registration_server           = var.registration_server,
+    enable_root_login             = var.enable_root_login ? 1 : 0
+  }))
+  tags = {
+    Name = "${var.name}-bastion"
+  }
   # Shutdowned machines shall not lead to a redeployment on apply.
   lifecycle {
     ignore_changes = [associate_public_ip_address]
