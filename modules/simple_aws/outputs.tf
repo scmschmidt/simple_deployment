@@ -29,5 +29,3 @@ output "bastion_info" {
   description = "Some aggregated data about the bastion host."
   sensitive   = false
 }
-
-output "debug" { value = local.subnets }

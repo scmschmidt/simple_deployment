@@ -117,7 +117,7 @@ The following arguments are supported:
 
 * `machines` (mandatory)
 
-  Map with unique `id` as key and a list with the size, the image data, the SSH key slot and rgistration code slot
+  Map with unique `id` as key and a list with the size, the image data, the SSH key slot and registration code slot
   for the instance: `[size, image, ssh_slot, regcode_slot]` as data.
 
   Id is used as an identifier for various resources. The machine name is a catenation of `name` and `id`.
@@ -183,7 +183,6 @@ The following arguments are supported:
   The list index is used as slot number in the machine or bastion host definition.
   This replaces the old `admin_user_key`.
 
-
   Default: ["-"]
 
 * `registration_server` (optional)
@@ -197,12 +196,6 @@ The following arguments are supported:
   Enable or disable the SSH root login (with `admin user key`).
   
   Default:      false 
-  
-* `amount` (optional)
-
-  So many instances of this machine description get created.
-   
-  Default:      1 
 
 
 ## Output
