@@ -66,7 +66,7 @@ The following arguments are supported:
 
 * `source` (mandatory) 
 
-   Points to the module directory either local (relative to the project folder or remote (GitHub).
+   Points to the module directory either local (relative to the project folder) or remote (GitHub).
    See https://www.terraform.io/language/modules/sources for details.
 
 * `location`  (mandatory)
@@ -113,12 +113,10 @@ The following arguments are supported:
 
   Size is an identifier to select the sizing for the virtual machine. 
   The identifiers must be provided by the file `sizing_gcp.yaml` in the project root directory, which  must contain the identifiers you want to use, which point to the GCP instance types. 
-  
-  An example can be found in the modules directory.
+    An example can be found in the modules directory.
   
   Image is an identifier to select the correct image for the virtual machine.
   The identifiers and the images must be provided by the file `images_gcp.yaml` in the project root directory, which must contain the identifiers you want to use, which point to the image.
-
   An example can be found in the modules directory.
 
   Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure, GCP and libvirt.   
@@ -175,3 +173,7 @@ The module outputs the following variables:
   * `size` - The sizing identifier used in the plan.
   * `image` - The image identifier used in the plan.
   * `ip_address` - The public IP for the instance.
+
+## Miscellaneous
+
+* GCP instances need up to a minute to be reachable via SSH after deployment. Be patient. 

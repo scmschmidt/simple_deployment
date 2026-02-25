@@ -50,7 +50,7 @@ The following arguments are supported:
 
 * `source` (mandatory) 
 
-  Points to the module directory either local (relative to the project folder or remote (GitHub).
+  Points to the module directory either local (relative to the project folder) or remote (GitHub).
   See https://www.terraform.io/language/modules/sources for details.
 
 * `location`  (optional)
@@ -84,16 +84,14 @@ The following arguments are supported:
   Size is an identifier to select the sizing for the virtual machine. 
   The identifiers must be provided by the file `sizing_libvirt.yaml` in the project root directory, which 
   must contain the identifiers you want to use, which contains sizing for vcpu, memory and disk.
-  
   An example can be found in the modules directory.
-  
+
   Image is an identifier to select the correct qcow image for the virtual machine.
   The identifiers and the images must be provided by the file `images_libvirt.yaml`, which 
   must contain the identifiers you want to use, which point to the qcow image.
-
   An example can be found in the modules directory.
 
-  Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure and libvirt.  
+  Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure, GCP and libvirt.  
 
 * `keymap` (optional)
 

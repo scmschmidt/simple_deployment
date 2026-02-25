@@ -1,7 +1,7 @@
 # simple_aws
 
 Creates a bunch of virtual machines on AWS.
-It makes use of https://registry.terraform.io/providers/hashicorp/aws/latest/docs and https://registry.terraform.io/providers/hashicorp/aws/latest/docs.
+It makes use of https://registry.terraform.io/providers/hashicorp/aws/latest/docs and https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest.
 
 ## Example Usage
 
@@ -80,7 +80,7 @@ The following arguments are supported:
 
 * `source` (mandatory) 
 
-   Points to the module directory either local (relative to the project folder or remote (GitHub).
+   Points to the module directory either local (relative to the project folder) or remote (GitHub).
    See https://www.terraform.io/language/modules/sources for details.
 
 * `location`  (mandatory)
@@ -125,16 +125,18 @@ The following arguments are supported:
   Size is an identifier to select the sizing for the virtual machine. 
   The identifiers must be provided by the file `sizing_aws.yaml` in the project root directory, which 
   must contain the identifiers you want to use, which point to the AWS instance types. 
+  An example can be found in the modules directory.
 
   Image is an identifier to select the correct AMI for the virtual machine.
   The identifiers and the images must be provided by the file `images_aws.yaml` in the project root directory, which
   must contain the identifiers you want to use, which point to the AMI per region.
+  An example can be found in the modules directory.
 
-  Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure and libvirt. 
+  Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure, GCP and libvirt. 
 
   The SSH key slot is the index (starting with 0) of the `admin_user_keys` list. This allows individual SSH public keys for different machines.
 
-  The registration code slot is the index (starting with 0) of the `subscription_registration_keys` list. This allows individual regitration codes
+  The registration code slot is the index (starting with 0) of the `subscription_registration_keys` list. This allows individual registration codes
   for different machines.
 
   The SSH key slot and the registration code slot can both be omitted. In this case the first key and regcode of the lists will be taken.

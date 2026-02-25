@@ -9,12 +9,11 @@
 # This example is written to support SLE OpenStack cloud images (used for libvirt) as well as the images on
 # AWS and Azure. Therefore you can use this for all three modules 'simple_libvirt', 'simple_aws' and 'simple_azure'.
 
-# Step 1 - Creating logon user and allow root logons (all key-based)
-#
-# We create an unprivileged user 'enter' who can authenticates with an RSA key. As member of the wheel
-# group he can do a password-less sudo (requires sudoers drop-in made by the provisioning script).
-# Also we provide a SSH key for the root login. If you don't need that, you can leave root alone.
-# (On AWS a blocker needs to be removed! See below at step 2).
+
+# Create an unprivileged user '${admin_username}' who can authenticates with the given SSH key.
+# As member of the wheel group he can do a password-less sudo (requires sudoers drop-in made
+# by the provisioning script below).
+# Also the given SSH key is used for the root login.
 
 users:
   - name: ${admin_username}
@@ -28,11 +27,8 @@ users:
       - ${admin_user_key}
 
 
-# Step 2 - Preparation of sudoers and registration on SCC 
-#
-# If you want to to an update or install software, do it after the registration here 
-# in this script. The cloud-init package module will not work, if the deployed image 
-# has no repositories defined (BYOS!)
+# Disables root login (if requested), enables passwordless sudo for wheel group members,
+# removes cloud-regionsrv-client-addon-azure and dummyadmin, sets keyboard and registers SLE.
 
 write_files:
   - path: /run/provision.sh
@@ -55,13 +51,6 @@ write_files:
       # Allowing users of the wheel group to do a passwordless sudo.
       # ('sudo: yes' in the user section did not work)
       echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/00_wheel_nopasswd
-
-      # Remove login blocker in authorized_keys for root on AWS.
-      # AWS puts a root blocker into /root/.ssh/authorized_keys, which we remove.
-      # This entry has no line feed and gets mixed up with the appended root key. 
-      # Therefore this "strange" sed replace.
-      # If you don't want/need direct root login, you can remove the command.
-      sed -i 's/^no-port-forwarding,.*sleep 10" ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
 
       # Load German keymap if necessary.
       # (This is only necessary for logins in the OpenStack SLES cloud images.
