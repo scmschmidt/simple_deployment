@@ -22,11 +22,15 @@ tiny:
   vcpu:     2
   memory:   2048
   disksize: 1500
+standard:
+  vcpu:     4
+  memory:   4096
+  disksize: 3500
 large:
   vcpu:     4
   memory:   4096
-  disksize: 2000
+  disksize: 4000
 x-large:
   vcpu:     8
   memory:   8192
-  disksize: 2000
+  disksize: 4000

@@ -11,27 +11,9 @@
 #   ...
 
 eu-central-1:
-  sles_12.2:      ami-0ade6e82137a63ef2  # suse-sles-12-sp2-byos-v20200615-hvm-ssd-x86_64 SUSE Linux Enterprise Server 12 SP2 for BYOS (HVM, 64-bit, SSD-Backed)
-  sles_12.3:      ami-0767dad13c56b7455  # suse-sles-12-sp3-byos-v20220201-hvm-ssd-x86_64 SUSE Linux Enterprise Server 12 SP3 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles_12.4:      ami-0ef400cd7b092c9e9  # suse-sles-12-sp4-byos-v20220201-hvm-ssd-x86_64 SUSE Linux Enterprise Server 12 SP4 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles_12.5:      ami-01995018f2fc9455f  # suse-sles-12-sp5-byos-v20220128-hvm-ssd-x86_64 SUSE Linux Enterprise Server 12 SP5 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles_15:        ami-02c25ef528ab7b229  # suse-sles-15-byos-v20220128-hvm-ssd-x86_64 SUSE Linux Enterprise Server 15 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles_15.1:      ami-0118d0571ce7f37d2  # suse-sles-15-sp1-byos-v20220128-hvm-ssd-x86_64 SUSE Linux Enterprise Server 15 SP1 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles_15.2:      ami-018b683688e81b3fc  # suse-sles-15-sp2-byos-v20220128-hvm-ssd-x86_64 SUSE Linux Enterprise Server 15 SP2 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles_15.3:      ami-049ddac513556c8bf  # suse-sles-15-sp3-byos-v20220309-hvm-ssd-x86_64 SUSE Linux Enterprise Server 15 SP3 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_12.3:  ami-0e69fbf5f5b087f67  # suse-sles-sap-12-sp3-byos-v20220201-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 12 SP3 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_12.4:  ami-09ccb0561268a83ad  # suse-sles-sap-12-sp4-byos-v20220201-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 12 SP4 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_12.5:  ami-03efcd80d8552950b  # suse-sles-sap-12-sp5-byos-v20220128-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 12 SP5 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15:    ami-010b959a2645cdef3  # suse-sles-sap-15-byos-v20220131-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 15 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15.1:  ami-0262fc3b36baaf0d8  # suse-sles-sap-15-sp1-byos-v20220131-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 15 SP1 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15.2:  ami-0db1e2abec1e6c9c5  # suse-sles-sap-15-sp2-byos-v20220131-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 15 SP2 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15.3:  ami-0fd7de237276326a4  # suse-sles-sap-15-sp3-byos-v20220309-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 15 SP3 - BYOS (HVM, 64-bit, SSD-Backed)
-
-eu-west-1:
-  sles_12.5:      ami-0004231c686dc15e0  # suse-sles-12-sp5-byos-v20210604-hvm-ssd-x86_64 SUSE Linux Enterprise Server 12 SP5 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15:    ami-006d91256a68effd6  # suse-sles-sap-15-byos-v20190623-hvm-ssd-x86_64 SUSE Linux Enterprise Server 15 for SAP Applications for BYOS (HVM, 64-bit, SSD-Backed) 
-  sles4sap_15.1:  ami-017953df5fa38a769  # suse-sles-sap-15-sp1-byos-v20200506-hvm-ssd-x86_64 SUSE Linux Enterprise Server 15 SP1 for SAP Applications for BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15.2:  ami-0002f3c3b7eee6568  # suse-sles-sap-15-sp2-byos-v20210310-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 15 SP2 - BYOS (HVM, 64-bit, SSD-Backed)
-  sles4sap_15.3:  ami-04812d2d4548b3e04  # suse-sles-sap-15-sp3-byos-v20220309-hvm-ssd-x86_64 SUSE Linux Enterprise Server for SAP Applications 15 SP3 - BYOS (HVM, 64-bit, SSD-Backed)
-                  
-
+  sles4sap_12.5:  ami-0ccba2316aaacb488  # suse-sles-sap-12-sp5-byos-v20251216-hvm-ssd-x86_64
+  sles4sap_15.4:  ami-0a523d03a86a8e342  # suse-sles-sap-15-sp4-byos-v20251023-hvm-ssd-x86_64
+  sles4sap_15.5:  ami-0deca08f59651da41  # suse-sles-sap-15-sp5-byos-v20251023-hvm-ssd-x86_64
+  sles4sap_15.6:  ami-0f54942766f27b8d7  # suse-sles-sap-15-sp6-byos-v20251022-hvm-ssd-x86_64
+  sles4sap_15.7:  ami-049a36d9a34372bd5  # suse-sles-sap-15-sp7-byos-v20251022-hvm-ssd-x86_64
+  sles4sap_16.0:  ami-01fd313c3673d300a  # suse-sles-sap-16-0-byos-v20251104-hvm-ssd-x86_64
