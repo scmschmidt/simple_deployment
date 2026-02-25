@@ -2,8 +2,8 @@
 locals {
   # If the deprecated 'admin_user_key' is used, we create 'admin_user_keys' with one entry 
   # otherwise we use the new 'admin_user_keys' directly with files resolved.
-  admin_user_keys_resolved = [ for e in local.admin_user_keys : startswith(e, "@") ? file(substr(e, 1, -1)) : e]
-  admin_user_keys = var.admin_user_key != null ? [var.admin_user_key] : var.admin_user_keys
+  admin_user_keys_resolved = [ for e in var.admin_user_keys : startswith(e, "@") ? file(substr(e, 1, -1)) : e]
+  admin_user_keys = var.admin_user_key != null ? [var.admin_user_key] : local.admin_user_keys_resolved
 
   # If the deprecated 'admin_user_key' is used, we create 'admin_user_keys' with one entry 
   # otherwise we use the new 'admin_user_keys' directly

@@ -38,8 +38,14 @@ variable "project" {
 }
 
 variable "machines" {
-  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tuple of size identifier and image identifier as value."
+  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tuple of size identifier, image identifier, SSH key index (optional) and registration key index (optional) as value."
   type        = map(list(string))
+}
+
+variable "bastion" {
+  description = "List with bastion host definition to deploy. First entry is a size identifier and the second the image identifier, the third the SSH key index and the fourth registration key index."
+  type        = list(string)
+  default     = []
 }
 
 variable "keymap" {
@@ -55,14 +61,27 @@ variable "admin_user" {
 }
 
 variable "admin_user_key" {
-  description = "The SSH public key for the admin user to logon to the machine."
+  description = "The SSH public key for the admin and root user to logon to the instances. (Deprecated! 'admin_user_keys' should be used instead.)"
   type        = string
+  default     = null
+}
+
+variable "admin_user_keys" {
+  description = "List of SSH public keys or key files (@ prefix) for the admin and root user to logon to the instances."
+  type        = list(string)
+  default     = null
 }
 
 variable "subscription_registration_key" {
-  description = "Subscription registration code to register SLES."
+  description = "Subscription registration code to register SLES. A dash skips (re-)registration. (Deprecated! 'admin_user_keys' should be used instead.)"
   type        = string
   default     = "-"
+}
+
+variable "subscription_registration_keys" {
+  description = "List of subscription registration codes to register SLES. A dash skips (re-)registration."
+  type        = list(string)
+  default     = ["-"]
 }
 
 variable "registration_server" {

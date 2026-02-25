@@ -141,7 +141,6 @@ The following arguments are supported:
 
   The SSH key slot and the registration code slot can both be omitted. In this case the first key and regcode of the lists will be taken.
 
-
 * `keymap` (optional)
 
   The keymap used on the machines.
@@ -157,8 +156,7 @@ The following arguments are supported:
 * `admin_user_key` (optional) *DEPRECATED*
 
   The SSH public key for the admin user to logon to the machine.
-  Deprecated, but if present it takes precedence over `admin_user_keys`! Internally `admin_user_keys` becomes
-  a list with one element containing the content of `admin_user_key`.
+  Deprecated, but if present it takes precedence over `admin_user_keys`! Internally `admin_user_keys` becomes a list with one element containing the content of `admin_user_key`.
 
   Default: null 
 
