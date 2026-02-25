@@ -18,14 +18,14 @@ locals {
                                                                  registration_server = var.registration_server,
                                                                  enable_root_login = var.enable_root_login ? 1 : 0
                                                                })
-  cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
-  cloudinit_userdata = templatefile(local.cloudinit_template, { keymap = var.keymap,
-                                                                admin_username = var.admin_user, 
-                                                                admin_user_key = var.admin_user_key, 
-                                                                subscription_registration_key = var.subscription_registration_key,
-                                                                registration_server = var.registration_server,
-                                                                enable_root_login = var.enable_root_login ? 1 : 0
-                                                              })
+  # cloudinit_template = fileexists("${path.root}/cloudinit.user-data.tftpl") ? "${path.root}/cloudinit.user-data.tftpl" : "${path.module}/cloudinit.user-data.tftpl"
+  # cloudinit_userdata = templatefile(local.cloudinit_template, { keymap = var.keymap,
+  #                                                               admin_username = var.admin_user, 
+  #                                                               admin_user_key = var.admin_user_key, 
+  #                                                               subscription_registration_key = var.subscription_registration_key,
+  #                                                               registration_server = var.registration_server,
+  #                                                               enable_root_login = var.enable_root_login ? 1 : 0
+  #                                                             })
 }
 
 terraform {
@@ -94,6 +94,10 @@ resource "google_compute_instance" "linux_vm" {
     }
   }
   metadata_startup_script = local.startup_script
-  #metadata = { user-data = local.cloudinit_userdata }
+  metadata = { 
+    #user-data              = local.cloudinit_userdata
+    enable-oslogin         = false  # Do not use GCP Project OS Login approach for SSH Keys
+    block-project-ssh-keys = true   # Do not use GCP Project Metadata approach for SSH Keys
+  }
 }
 

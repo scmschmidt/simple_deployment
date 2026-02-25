@@ -38,7 +38,7 @@ variable "project" {
 }
 
 variable "machines" {
-  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tupel of size identifier and image identifier as value."
+  description = "Map of machine definitions to deploy. Each key is a unique identifier with a tuple of size identifier and image identifier as value."
   type        = map(list(string))
 }
 
@@ -49,13 +49,13 @@ variable "keymap" {
 }
 
 variable "admin_user" {
-  description = "The unpriviledged user to logon to the deployed machine."
+  description = "The unprivileged user to logon to the deployed machine."
   type        = string
   default     = "enter"
 }
 
 variable "admin_user_key" {
-  description = "The SSH public key for the admin unser to logon to the machine."
+  description = "The SSH public key for the admin user to logon to the machine."
   type        = string
 }
 
@@ -66,7 +66,7 @@ variable "subscription_registration_key" {
 }
 
 variable "registration_server" {
-  description = "URL to the registartion server."
+  description = "URL to the registration server."
   type        = string
   default     = "https://scc.suse.com"
 }
