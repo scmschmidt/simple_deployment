@@ -1,0 +1,24 @@
+# This is an example for "images_gcp.yaml", which need to be created in your
+# project root for the simple_aws module to find it.
+#
+# The labels can be chosen freely and should reference the AMI in the particular region.
+# A list of all (SUSE) images can be retrieved with: 'gcloud compute images list'
+# Alternatively https://pint.suse.com can be used to create such a list.
+#
+# <label>: <project>/<family>|<project>/<name>
+#   ...
+
+
+sles_12.5:      suse-cloud/sles-12-sp5
+sles_15.4:      suse-cloud/sles-15-sp4
+sles_15.5:      suse-cloud/sles-15-sp5
+sles_15.6:      suse-cloud/sles-15-sp6
+sles_15.7:      suse-cloud/sles-15-sp7
+sles_16.0:      suse-cloud/sles-16-0-x86-64
+
+sles4sap_12.5:  suse-sap-cloud/sles-12-sp5-sap
+sles4sap_15.4:  suse-sap-cloud/sles-15-sp4-sap
+sles4sap_15.5:  suse-sap-cloud/sles-15-sp5-sap
+sles4sap_15.6:  suse-sap-cloud/sles-15-sp6-sap
+sles4sap_15.7:  suse-sap-cloud/sles-15-sp7-sap
+sles4sap_16.0:  suse-sap-cloud/sles-sap-16-0-x86-64

@@ -1,0 +1,60 @@
+
+#cloud-config
+# vim: syntax=yaml
+#
+# This is a cloudinit configuration to setup certain things on deployment.
+# See https://cloudinit.readthedocs.io/en/latest/topics/modules.html for all
+# the possibilities and https://cloudinit.readthedocs.io/en/latest/topics/examples.html for some examples.
+
+
+# Create an unprivileged user '${admin_username}' who can authenticates with the given SSH key.
+# As member of the wheel group he can do a password-less sudo (requires sudoers drop-in made
+# by the provisioning script below).
+# Also the given SSH key is used for the root login.
+
+users:
+  - name: ${admin_username}
+    groups: wheel
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${admin_user_key}
+  - name: root
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${admin_user_key}
+
+
+# Disables root login (if requested), enables passwordless sudo for wheel group members
+# set keyboard and register SLE.
+
+write_files:
+  - path: /run/provision.sh
+    permissions: 0500
+    owner: root
+    content: |
+      #!/bin/bash
+
+      # Disable root SSH login if wanted (in a cheap way).
+      [ "${enable_root_login}" -eq 0 ] && ( echo 'PermitRootLogin no' >> /etc/ssh/sshd_config ; systemctl restart sshd.service )
+
+      # Allowing users of the wheel group to do a passwordless sudo.
+      # ('sudo: yes' in the user section did not work)
+      echo '%wheel ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/00_wheel_nopasswd
+
+      # Load German keymap if necessary.
+      # (This is only necessary for logins in the OpenStack SLES cloud images.
+      # Also, for unknown reasons, the cloud-init keyboard module didn't work.)
+      [[ $(localectl --no-pager status | grep Keymap) =~ ${keymap} ]] || /usr/bin/localectl set-keymap "${keymap}"
+
+      # Register the SLE.
+      SUSEConnect --clean
+      if [ "${registration_server}" != '-' ] ; then
+        if [ "${subscription_registration_key}" == '-' ] ; then 
+          SUSEConnect  --url "${registration_server}"
+        else
+          SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
+        fi
+      fi
+      
+runcmd:
+  - /run/provision.sh
