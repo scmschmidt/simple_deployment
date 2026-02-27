@@ -14,7 +14,7 @@ locals {
 
   # If the deprecated 'admin_user_key' is used, we create 'admin_user_keys' with one entry 
   # otherwise we use the new 'admin_user_keys' directly
-  subscription_registration_keys = var.subscription_registration_key != "-" ? [var.subscription_registration_key] : var.subscription_registration_keys
+  subscription_registration_keys = var.subscription_registration_key != null ? [var.subscription_registration_key] : var.subscription_registration_keys
 
   # New machine definition format has four entries (size, image, ssh key slot, reg key slot),
   # but the old two entry-format (size, image) needs to be supported, so as default the 

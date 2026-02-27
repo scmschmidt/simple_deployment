@@ -51,19 +51,19 @@ variable "admin_user_keys" {
 }
 
 variable "subscription_registration_key" {
-  description = "Subscription registration code to register SLES. A dash skips (re-)registration. (Deprecated! 'admin_user_keys' should be used instead.)"
+  description = "Subscription registration code to register SLES. (Deprecated! 'admin_user_keys' should be used instead.)"
   type        = string
-  default     = "-"
+  default     = null
 }
 
 variable "subscription_registration_keys" {
-  description = "List of subscription registration codes to register SLES. A dash skips (re-)registration."
+  description = "List of subscription registration codes to register SLES."
   type        = list(string)
-  default     = ["-"]
+  default     = []
 }
 
 variable "registration_server" {
-  description = "URL to the registartion server."
+  description = "URL to the registration server.  A dash skips (re-)registration."
   type        = string
   default     = "https://scc.suse.com"
 }

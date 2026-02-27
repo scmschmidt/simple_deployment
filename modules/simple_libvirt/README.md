@@ -150,22 +150,22 @@ The following arguments are supported:
   Internally `subscription_registration_keys` becomes a list with one element containing the content
   of `subscription_registration_key`.
 
-  Default: "-"
+  Default: null
 
 * `subscription_registration_keys` (optional)
 
-  List of subscription registration codes to register SLE. A dash skips (re-)registration.
+  List of subscription registration codes to register SLE.
   The list index is used as slot number in the machine or bastion host definition.
   This replaces the old `admin_user_key`.
 
-  Default: ["-"]
-  
+  Default: []
+
 * `registration_server` (optional)
 
   URL to the registration server. A "-" as value skips the registration.
    
   Default:      https://scc.suse.com
-   
+
 * `enable_root_login` (optional)
 
   Enable or disable the SSH root login (with `admin user key`).
