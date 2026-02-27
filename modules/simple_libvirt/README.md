@@ -158,7 +158,9 @@ The `virtqemud` has normally a timeout (default 120s), so the socket is not perm
 Connecting via a user session instead of a system session has some implications:
   - Networks cannot be created (missing permission to create network devices).
   - Existing networks created via `qemu:///system` are not available.
-  
+  - On SLE images sometimes only IPv6 addresses are returned, if DHCP takes time.
+    A `terraform refresh` after a few seconds usually provides IPv4 at the output.
+
 But it is possible to add interfaces (e.g bridges) of existing networks (created via `qemu:///system`) to a domain/machine.
 
 What needs to be done?

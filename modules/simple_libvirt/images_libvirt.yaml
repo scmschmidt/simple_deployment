@@ -7,12 +7,23 @@
 #
 # <label>: <uri to image>
 
-sles_12.1:  /isos/SLES12-SP1-JeOS-SE-for-OpenStack-Cloud.x86_64-GM.qcow2
-sles_12.3:  /isos/SLES12-SP3-JeOS-for-OpenStack-Cloud.x86_64-GM.qcow2
-sles_12.4:  /isos/SLES12-SP4-JeOS.x86_64-12.4-OpenStack-Cloud-GM.qcow2
-sles_12.5:  /isos/SLES12-SP5-JeOS.x86_64-12.5-OpenStack-Cloud-GM.qcow2
-sles_15:    /isos/SLES15-JeOS.x86_64-15.0-OpenStack-Cloud-GM.qcow2
-sles_15.1:  /isos/SLES15-SP1-JeOS.x86_64-15.1-OpenStack-Cloud-QU5.qcow2
-sles_15.2:  /isos/SLES15-SP2-JeOS.x86_64-15.2-OpenStack-Cloud-QU2.qcow2
-sles_15.3:  /isos/SLES15-SP3-JeOS.x86_64-15.3-OpenStack-Cloud-QU2.qcow2
-sles_15.4:  /isos/SLES15-SP4-Minimal-VM.x86_64-OpenStack-Cloud-PublicBeta-202202.qcow2
+sles_12.5_orig:      /isos/qcows/processed/SLES-12.5.qcow2
+sles_15.4_orig:      /isos/qcows/processed/SLES-15.4.qcow2
+sles_15.5_orig:      /isos/qcows/processed/SLES-15.5.qcow2
+sles_15.6_orig:      /isos/qcows/processed/SLES-15.6.qcow2
+sles_15.7_orig:      /isos/qcows/processed/SLES-15.7.qcow2
+sles_16.0_orig:      /isos/qcows/processed/SLES-16.0.qcow2
+sles4sap_16.0_orig:  /isos/qcows/processed/SLES4SAP-16.0.qcow2
+
+sles_12.5:      /isos/qcows/processed/SLES-12.5-base.qcow2
+sles_15.4:      /isos/qcows/processed/SLES-15.4-base.qcow2
+sles_15.5:      /isos/qcows/processed/SLES-15.5-base.qcow2
+sles_15.6:      /isos/qcows/processed/SLES-15.6-base.qcow2
+sles_15.7:      /isos/qcows/processed/SLES-15.7-base.qcow2
+sles_16.0:      /isos/qcows/processed/SLES-16.0-base.qcow2
+sles4sap_12.5:  /isos/qcows/processed/SLES4SAP-12.5-base.qcow2
+sles4sap_15.4:  /isos/qcows/processed/SLES4SAP-15.4-base.qcow2
+sles4sap_15.5:  /isos/qcows/processed/SLES4SAP-15.5-base.qcow2
+sles4sap_15.6:  /isos/qcows/processed/SLES4SAP-15.6-base.qcow2
+sles4sap_15.7:  /isos/qcows/processed/SLES4SAP-15.7-base.qcow2
+sles4sap_16.0:  /isos/qcows/processed/SLES4SAP-16.0-base.qcow2

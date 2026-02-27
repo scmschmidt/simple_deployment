@@ -21,12 +21,7 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      
-      # Getting IPv4 addresses via DHCP does not work reliable with newer versions
-      # (0.8.3 still did not) in session mode: https://github.com/dmacvicar/terraform-provider-libvirt/issues/1091
-      # Therefore to allow qemu user sessions - which requires the qemu-guest-agent -
-      # a version lock is required (and only for that specific scenario).
-      version = "0.7.1"
+      version = "0.8.3"   # latest working version (rewrite with 0.9.0!)
     }
   }
   required_version = ">= 1.1.0"
