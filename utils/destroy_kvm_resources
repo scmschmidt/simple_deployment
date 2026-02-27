@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Erases all resources associated to ...
+
+function error_on_exit() {
+    echo -e "${@}" >&2
+    exit 1
+}
+
+trim() {
+    local var="$*"
+    var="${var#"${var%%[![:space:]]*}"}"
+    var="${var%"${var##*[![:space:]]}"}"
+    echo "${var}"
+}
+
+
+# Check arguments.
+[ ${#} -ne 2 ] && error_on_exit "Usage: ${0} LANDSCAPE_NAME QEMU_URI"
+resource_name="${1}"
+qemu_uri="${2}"
+
+# Destroy all domains.
+while read domain ; do
+    [ -z "${domain}" ] && continue
+    echo "Destroying domain: ${domain}"
+    virsh --connect "${qemu_uri}" shutdown "${domain}"
+    virsh --connect "${qemu_uri}" destroy "${domain}"
+    virsh --connect "${qemu_uri}" undefine "${domain}" --remove-all-storage
+done < <(virsh --connect "${qemu_uri}" list --all --name | grep "^${resource_name}")
+
+# Destroy all volumes.
+while read pool ; do
+    [ -z "${pool}" ] && continue
+    while read volume ; do
+        [ -z "${volume}" ] && continue
+        echo "Destroying volume: ${volume} (pool: ${pool})"
+        virsh --connect "${qemu_uri}" vol-delete --pool "${pool}" "${volume}"
+    done < <(virsh --connect "${qemu_uri}" vol-list --pool "${pool}" | tail -n +3 | tr -s ' ' | cut -d ' ' -f 2 | grep "^${resource_name}")
+done < <(virsh --connect "${qemu_uri}" pool-list --all --name)
+
+# Destroy all networks.
+while read network ; do
+    [ -z "${network}" ] && continue
+    echo "Destroying network: ${network}"
+    virsh --connect "${qemu_uri}" net-destroy "${network}"
+    virsh --connect "${qemu_uri}" net-undefine "${network}"
+done < <(virsh --connect "${qemu_uri}" net-list --all --name | grep "^${resource_name}")
+
+# Bye.
+echo "Everything done! Bye."
+exit 0
+
