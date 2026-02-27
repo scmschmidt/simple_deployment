@@ -7,7 +7,7 @@ It makes use of https://registry.terraform.io/providers/dmacvicar/libvirt/latest
 ## Example Usage
 
 ```
-module "simple_libvirt" {
+module "test_landscape_C" {
 
   # Path to the module.
   source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_libvirt"
@@ -19,28 +19,42 @@ module "simple_libvirt" {
   # The name prefix for our resources.
   name = "sschmidt-spielwiese"
 
-  # Map of the machines to create. Each machine has a unique id with a tuple of 'size' and 'image'.
+  # Map of the machines to create. 
+  # Each machine has a unique id with a list of 'size', 'image', ssh key slot and
+  # reg code slot (see 'admin_user_keys' and 'subscription_registration_keys' below). 
   machines = {
-    1    = ["micro", "sles_15"],
-    2    = ["micro", "sles_15.1"],
-    "3a" = ["micro", "sles_15.1"],
-    "3b" = ["micro", "sles_15.2"],
-    4    = ["micro", "sles_15.3"]
+    1    = ["micro", "sles_15",   0, 0],
+    2    = ["micro", "sles_15.1", 0, 0],
+    "3a" = ["micro", "sles_15.1", 0, 0],
+    "3b" = ["micro", "sles_15.2", 0, 0],
+    4    = ["micro", "sles_15.3", 0, 0]
   }
 
   # We need a German keyboard.
   keymap = "de-latin1-nodeadkeys"
 
-  # Our logon user with SSH public key.
-  admin_user = "enter"
-  admin_user_key = "ssh-rsa ..." 
+  # Our logon user with SSH public keys or files containing the key.
+  # The key list index is used as slot number in the above machine map.
+  admin_user     = "enter"
+  admin_user_keys = ["ssh-rsa ...", "@~/.ssh/id_rsa.pub"] 
 
-  # Server and key to register the SLES.
-  subscription_registration_key = "..."
-  registration_server = "https://scc.suse.com"
+  # Server and keys to register the SLE.
+  # The key list index is used as slot number in the above machine map.
+  subscription_registration_keys = ["..."]
+  registration_server           = "https://scc.suse.com"
 
   # We also want to logon as root.
   enable_root_login = true
+
+  # Return the Name, size/image and IP address of each instance, eg.:
+  output "test_machines" {
+    value = [
+      for name, info in module.test_landscape_C.machine_info :
+      "${name} : ${info.size}/${info.image} -> ${info.ip_address}"
+    ]
+    description = "Information about the instances."
+    sensitive   = false
+  }
 }
 ```
 
@@ -76,7 +90,8 @@ The following arguments are supported:
 
 * `machines` (mandatory)
 
-  Map with unique `id` as key and tuples with the size and image data for the instance: `[size, image]` as data.
+  Map with unique `id` as key and a list with the size, the image data, the SSH key slot and registration code slot
+  for the instance: `[size, image, ssh_slot, regcode_slot]` as data.
 
   Id is used as an identifier for various resources. The machine name is a catenation of `name` and `id`.
   **Take care, that the `key` is unique! Terraform will always take silently the last hit. "Renaming" of machines can lead to strange effects and might brake your environment!**
@@ -91,7 +106,14 @@ The following arguments are supported:
   must contain the identifiers you want to use, which point to the qcow image.
   An example can be found in the modules directory.
 
-  Having a mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure, GCP and libvirt.  
+  Having an identifier mapping allows the usage of the same identifier with all three modules. The mapping resolves them into the correct names for AWS, Azure, GCP and libvirt.
+
+  The SSH key slot is the index (starting with 0) of the `admin_user_keys` list. This allows individual SSH public keys for different machines.
+
+  The registration code slot is the index (starting with 0) of the `subscription_registration_keys` list. This allows individual registration codes
+  for different machines.
+
+  The SSH key slot and the registration code slot can both be omitted. In this case the first key and regcode of the lists will be taken.
 
 * `keymap` (optional)
 
@@ -105,15 +127,38 @@ The following arguments are supported:
    
   Default: enter 
 
-* `admin_user_key` (mandatory)
-   
-  The SSH public key for the admin user to logon to the machine.
+* `admin_user_key` (optional) *DEPRECATED*
 
-* `subscription_registration_key` (optional)
-   
-  Subscription registration code to register SLES.
+  The SSH public key for the admin user to logon to the machine.
+  Deprecated, but if present it takes precedence over `admin_user_keys`! Internally `admin_user_keys` becomes
+  a list with one element containing the content of `admin_user_key`.
+
+  Default: null 
+
+* `admin_user_keys` (optional)
   
+  List of SSH public keys or key files (@ prefix) for the admin and root user to logon to the instances.
+  The list index is used as slot number in the machine or bastion host definition.
+  This replaces the old `admin_user_key`.
+
+  Default: [] 
+
+* `subscription_registration_key` (optional) *DEPRECATED*
+
+  Subscription registration code to register SLE.
+  Deprecated, but if present it takes precedence over `subscription_registration_keys`!  
+  Internally `subscription_registration_keys` becomes a list with one element containing the content
+  of `subscription_registration_key`.
+
   Default: "-"
+
+* `subscription_registration_keys` (optional)
+
+  List of subscription registration codes to register SLE. A dash skips (re-)registration.
+  The list index is used as slot number in the machine or bastion host definition.
+  This replaces the old `admin_user_key`.
+
+  Default: ["-"]
   
 * `registration_server` (optional)
 

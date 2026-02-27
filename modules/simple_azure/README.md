@@ -7,7 +7,7 @@ It makes use of https://registry.terraform.io/providers/hashicorp/azurerm/latest
 ## Example Usage
 
 ```
-module "simple_azure" {
+module "test_landscape_B" {
 
   # Path to the module.
   source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_azure"
@@ -23,7 +23,7 @@ module "simple_azure" {
   # Each machine has a unique id with a list of 'size', 'image', ssh key slot and
   # reg code slot (see 'admin_user_keys' and 'subscription_registration_keys' below). 
   machines = {
-    1    = ["standard_b1", "sles4sap_15", 0, 0],
+    1    = ["standard_b1", "sles4sap_15", 0, 0]],
     2    = ["standard_b1", "sles4sap_15.1", 0, 0],
     "3a" = ["standard_b1", "sles4sap_15.1", 1, 0],
     "3b" = ["standard_b1", "sles4sap_15.2", 1, 0],
@@ -54,10 +54,6 @@ module "simple_azure" {
 }
 
 # Return the Name, size/image and IP address of each instance, eg.:
-#   test_machines_B = [
-#     "sschmidt-testlandscape-B-0 : standard_b1/sles4sap_15 -> 137.116.221.168",
-#     "sschmidt-testlandscape-B-1 : standard_b1/sles4sap_15 -> 20.224.248.88",
-#     ...
 output "test_machines" {
   value = [
     for name, info in module.test_landscape_B.machine_info :
@@ -167,7 +163,7 @@ The following arguments are supported:
   The list index is used as slot number in the machine or bastion host definition.
   This replaces the old `admin_user_key`.
 
-  Default: null 
+  Default: [] 
 
 * `subscription_registration_key` (optional) *DEPRECATED*
 

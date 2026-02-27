@@ -6,7 +6,7 @@ It makes use of https://registry.terraform.io/providers/hashicorp/aws/latest/doc
 ## Example Usage
 
 ```
-module "simple_aws" {
+module "test_landscape_A" {
 
   # Path to the module.
   source = "git::https://github.com/scmschmidt/simple_deployment.git//modules/simple_aws"
@@ -53,10 +53,6 @@ module "simple_aws" {
 }
 
 # Return the Name, size/image and IP address of each instance, eg.:
-#   test_machines_A = [
-#     "sschmidt-testlandscape-A-0 : t3.nano/sles4sap_15 -> 34.245.45.135",
-#     "sschmidt-testlandscape-A-1 : t3.nano/sles4sap_15 -> 54.154.207.236",
-#     ...
 output "test_machines" {
   value = [
     for name, info in module.test_landscape_A.machine_info :
@@ -166,7 +162,7 @@ The following arguments are supported:
   The list index is used as slot number in the machine or bastion host definition.
   This replaces the old `admin_user_key`.
 
-  Default: null 
+  Default: [] 
 
 * `subscription_registration_key` (optional) *DEPRECATED*
 

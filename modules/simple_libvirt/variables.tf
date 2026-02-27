@@ -39,14 +39,27 @@ variable "admin_user" {
 }
 
 variable "admin_user_key" {
-  description = "The SSH public key for the admin unser to logon to the machine."
+  description = "The SSH public key for the admin and root user to logon to the instances. (Deprecated! 'admin_user_keys' should be used instead.)"
   type        = string
+  default     = null
+}
+
+variable "admin_user_keys" {
+  description = "List of SSH public keys or key files (@ prefix) for the admin and root user to logon to the instances."
+  type        = list(string)
+  default     = []
 }
 
 variable "subscription_registration_key" {
-  description = "Subscription registration code to register SLES."
+  description = "Subscription registration code to register SLES. A dash skips (re-)registration. (Deprecated! 'admin_user_keys' should be used instead.)"
   type        = string
   default     = "-"
+}
+
+variable "subscription_registration_keys" {
+  description = "List of subscription registration codes to register SLES. A dash skips (re-)registration."
+  type        = list(string)
+  default     = ["-"]
 }
 
 variable "registration_server" {
