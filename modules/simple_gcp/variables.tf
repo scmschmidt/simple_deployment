@@ -69,7 +69,7 @@ variable "admin_user_key" {
 variable "admin_user_keys" {
   description = "List of SSH public keys or key files (@ prefix) for the admin and root user to logon to the instances."
   type        = list(string)
-  default     = null
+  default     = []
 }
 
 variable "subscription_registration_key" {
