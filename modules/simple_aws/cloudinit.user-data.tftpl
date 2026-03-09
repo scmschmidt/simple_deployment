@@ -52,15 +52,27 @@ write_files:
       # Also, for unknown reasons, the cloud-init keyboard module didn't work.)
       [[ $(localectl --no-pager status | grep Keymap) =~ ${keymap} ]] || /usr/bin/localectl set-keymap "${keymap}"
 
-      # Register the SLE.
-      SUSEConnect --clean
-      if [ "${registration_server}" != '-' ] ; then
-        if [ "${subscription_registration_key}" == '-' ] ; then 
-          SUSEConnect  --url "${registration_server}"
-        else
-          SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}"
-        fi
-      fi
-      
+      # Register the OS.
+      os_name=$(grep '^NAME=' /etc/os-release | cut -d = -f 2 | tr -d '"')
+      case "$${os_name}" in
+        SLES)
+          SUSEConnect --clean
+          if [ "${registration_server}" != '-' ] ; then
+            for ((c=0;c<=10;c++)) ; do
+              echo "Registration trial #$${c}."
+              if [ -z "${subscription_registration_key}" ] ; then 
+                SUSEConnect  --url "${registration_server}" && break
+              else
+                SUSEConnect -r "${subscription_registration_key}" --url "${registration_server}" && break
+              fi
+              sleep 1
+            done
+          fi
+          ;;
+        *)
+          echo "OS is \"$${os_name}\". No registration."
+          ;;
+      esac
+
 runcmd:
   - /run/provision.sh
